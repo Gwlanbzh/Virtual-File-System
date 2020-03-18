@@ -3,9 +3,9 @@ def seek(name: str, addr_block: int):
     """
 
 def read():
-    """read the block of 512o on which the cursor is.
+    """read the block of 512 o on which the cursor is.
     """
 
 def write(data: str):
-    """write [data] in the block of 512o on which the cursor is.
+    """write [data] in the block of 512 o on which the cursor is.
     """
