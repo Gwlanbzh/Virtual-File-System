@@ -1,8 +1,3 @@
-def init(name: str):
-    """Initializes a virtual partition.
-    """
-    pass
-
 def nb_blocks(name: str) - int:
     """return the numbre of blocks of a virtual partition
     """
