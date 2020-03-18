@@ -1,4 +1,4 @@
-def seek(name: str, addr_block: int):
+def seek(str, addr_block: int):
     """move the cursor on the [addr_block] th block of 512o.
     """
 
