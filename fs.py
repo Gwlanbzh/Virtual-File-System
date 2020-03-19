@@ -8,12 +8,12 @@ def init(PATH: str) -> int:
 # Mounting a virtual partition.
 
 def mount_dsk(PATH: str) -> int:
-    """mounts the virtual partition.
+    """Mounts the virtual partition.
     """
     pass
 
 def umount_dsk(MNT: str) -> int:
-    """umounts the virtual partition.
+    """Umounts the virtual partition.
     """
     pass
 
@@ -53,7 +53,7 @@ def fclose(f: file_ptr) -> int:
 # positionning the cursor to the beginning of a file.
 
 def seek_file_beg(FILE: str) -> int:
-    """position the cursor at the beginning of a file.
+    """Positions the cursor at the beginning of a file.
     """
     pass
 
@@ -65,6 +65,6 @@ def fread(f: file_ptr, nb_blocks: int) -> bytes:
     pass
 
 def fwrite(f: file_ptr, to_write) -> int:
-    """write some bytes to a file.
+    """Writes some bytes to a file.
     """
     pass
