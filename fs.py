@@ -8,7 +8,7 @@ def init(PATH: str) -> int:
 
 
 
-# Opening and cllosing of a file.
+# Opening and closing of a file.
 
 
 
