@@ -6,7 +6,7 @@ def nb_blocks(name: str) -> int:
         return len(data)//512 + int(len(data) % 512 != 0)*1
 
 def seek(name: str, addr_block: int) -> int:
-    """move the cursor on the [addr_block] th block of 512o.
+    """move the cursor on the [addr_block] th block of 512 o.
     """
     pass
 
