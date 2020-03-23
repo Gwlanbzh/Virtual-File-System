@@ -5,14 +5,9 @@ def init(PATH: str) -> int:
     """
     pass
     
-# Mounting a virtual partition.
+# Unmounting a virtual partition.
 
-def mount_dsk(PATH: str) -> int:
-    """Mounts the virtual partition.
-    """
-    pass
-
-def umount_dsk(MNT: str) -> int:
+def unmount(MNT: str) -> int:
     """Umounts the virtual partition.
     """
     pass
