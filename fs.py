@@ -4,7 +4,7 @@ def init(PATH: str) -> int:
     """Initializes a virtual partition, which needs to be unmounted.
     """
     pass
-    
+
 # Mounting a virtual partition.
 
 def mount_dsk(PATH: str) -> int:
@@ -28,6 +28,11 @@ def ls(DIR: str) -> str:
 
 def mkdir(parent_dir, NAME: str) -> int:
     """Creates an empty directory.
+    """
+    pass
+
+def rmkdir(parent_dir, NAME: str) -> int:
+    """Delete an empty directory.
     """
     pass
 
