@@ -36,13 +36,6 @@ def rmkdir(parent_dir, NAME: str) -> int:
     """
     pass
 
-# Reading a file's metadatas.
-
-def read_meta(FILE: str) -> meta:
-    """Returns a file's metadata as a struct called "meta".
-    """
-    pass
-
 # Opening and closing of a file.
 
 def fopen(FILE: str, mode: char) -> file_ptr:
