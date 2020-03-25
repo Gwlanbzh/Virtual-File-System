@@ -19,7 +19,7 @@ class disk(object):
         if self.nb_blocks() <= addr_block:
             return -1
         self.cursor = addr_block
-        return 1
+        return 0
 
     def read(self, nb_blocks: int) -> bytes:
         """read the block of 512 o on which the cursor is.
