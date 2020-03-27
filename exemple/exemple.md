@@ -6,6 +6,17 @@ The second block is the root directory.
 
 If the first bytes of each blocks is 00, the block is a dir, if the byte is 01, the block is a file.
 
+the following exemple can be represent like that :
+
+```
+ /
+ ├── dir1
+ │   └── sub_dir1
+ │       
+ └── dir2
+     └── file1
+```
+
 ## bloc 0 :
 
 ![Bloc1](bloc1.png)
