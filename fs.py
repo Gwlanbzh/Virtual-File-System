@@ -57,8 +57,8 @@ def seek_file_beg(FILE: str) -> int:
 
 # Reading and writing to a file.
 
-def fread(f: file_ptr, nb_blocks: int) -> bytes:
-    """Reads nb_blocks blocks of 512 bytes from the file f.
+def fread(f: file_ptr) -> bytes:
+    """Reads the file f.
     """
     pass
 
