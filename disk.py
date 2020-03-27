@@ -16,10 +16,10 @@ class disk(object):
     def seek(self, addr_block: int) -> int:
         """move the cursor on the [addr_block] th block of 512 o.
         """
-        if self.nb_blocks() <= addr_block:
+        if self.nb_blocks() < addr_block:
             return -1
         if addr_block == -1:
-            self.cursor = self.nb_blocks() - 1
+            self.cursor = self.nb_blocks()
             return 0
         self.cursor = addr_block
         return 0
@@ -40,14 +40,11 @@ class disk(object):
         data = data.encode()
         if len(data) != 512 * nb_blocks:
             data += b"\x00" * (nb_blocks * 512 - (len(data) % 512))
-        with open(self.name, "rb") as file:
-            before = file.read(self.cursor * 512)
-            erase = file.read(nb_blocks)
-            if self.nb_blocks() - self.cursor * 512 - nb_blocks > 0:
-                after = file.read(self.nb_blocks() - self.cursor * 512 - nb_blocks)
-            else:
-                after = b""
-        with open(self.name, "wb") as file:
-            file.seek(0)
-            file.write(before + data + after)
+        try:
+            f = open(self.name ,'r+b')
+        except IOError:
+            f = open(self.name ,'wb')
+        f.seek(self.cursor * 512)
+        f.write(data)
+        f.close()
         return 0
