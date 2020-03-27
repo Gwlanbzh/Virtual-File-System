@@ -46,5 +46,6 @@ class disk(object):
             f = open(self.name ,'wb')
         f.seek(self.cursor * 512)
         f.write(data)
+        self.cursor += nb_blocks
         f.close()
         return 0
