@@ -1,5 +1,6 @@
 import disk
-DISK = "C:\\Users\\gabri\\Desktop\\disk.txt"
+DISK = "" # disk location
+ROOT_LOCATION = 1 # root dir location
 
 # Formatting a virtual partition.
 
@@ -31,7 +32,7 @@ def ls(DIR: str) -> list:
     else:
         raise SyntaxError("invalid path")
     diskfile = disk.disk(DISK)
-    diskfile.seek(1)
+    diskfile.seek(ROOT_LOCATION)
     emplacement = 1
     i = 1
     while True:
