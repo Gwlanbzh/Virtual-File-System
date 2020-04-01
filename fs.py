@@ -57,7 +57,7 @@ def mkdir(parent_dir, NAME: str) -> int:
     """
     pass
 
-def rmkdir(parent_dir, NAME: str) -> int:
+def rmdir(parent_dir, NAME: str) -> int:
     """Delete an empty directory.
     """
     pass
