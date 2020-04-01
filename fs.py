@@ -1,11 +1,15 @@
+import disk
+DISK = "" # disk location
+ROOT_LOCATION = 1 # root dir location
+
 # Formatting a virtual partition.
 
 def init(PATH: str) -> int:
     """Initializes a virtual partition, which needs to be unmounted.
     """
     pass
-    
-# Unmounting a virtual partition.
+
+# Mounting a virtual partition.
 
 def unmount(MNT: str) -> int:
     """Umounts the virtual partition.
@@ -14,10 +18,32 @@ def unmount(MNT: str) -> int:
 
 # Reading a directory's content.
 
-def ls(DIR: str) -> str:
+def ls(DIR: str) -> list:
     """Read a directory's content.
     """
-    pass
+    path = DIR.split("/")
+    if path[0] == "" and path[len(path) - 1] == "":
+        path[0] = "/"
+    else:
+        raise SyntaxError("invalid path")
+    diskfile = disk.disk(DISK)
+    diskfile.seek(ROOT_LOCATION)
+    emplacement = 1
+    i = 1
+    while True:
+        diskfile.seek(emplacement)
+        dir = diskfile.read(1)
+        data = dir.replace(b"\x00", b"").split(";".encode())
+        data[0] = data[0][1:len(data[0])]
+        data[len(data) - 1] = data[len(data) - 1][0:len(data[len(data) - 1]) - 1]
+        for x in data:
+            if path[i] == "":
+                return [x[0:-6] for x in data]
+            if path[i].encode() in x:
+                i += 1
+                emplacement = int(x[-4:-1])
+                break
+
 
 # Entry appending and deletion in a directory.
 
@@ -26,21 +52,19 @@ def mkdir(parent_dir, NAME: str) -> int:
     """
     pass
 
-# Reading a file's metadatas.
-
-def read_meta(FILE: str) -> meta:
-    """Returns a file's metadata as a struct called "meta".
+def rmdir(parent_dir, NAME: str) -> int:
+    """Delete an empty directory.
     """
     pass
 
 # Opening and closing of a file.
 
-def fopen(FILE: str, mode: char) -> file_ptr:
+def fopen(FILE: str, mode: str):
     """Opens a file.
     """
     pass
 
-def fclose(f: file_ptr) -> int:
+def fclose(f) -> int:
     """Closes a file.
     """
     pass
@@ -54,12 +78,12 @@ def seek_file_beg(FILE: str) -> int:
 
 # Reading and writing to a file.
 
-def fread(f: file_ptr, nb_blocks: int) -> bytes:
-    """Reads nb_blocks blocks of 512 bytes from the file f.
+def fread(f) -> bytes:
+    """Reads the file f.
     """
     pass
 
-def fwrite(f: file_ptr, to_write) -> int:
+def fwrite(f, to_write) -> int:
     """Writes some bytes to a file.
     """
     pass
