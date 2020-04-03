@@ -2,7 +2,7 @@
 
 ## Definitions.
 
-The "blocks" we will be talking about are 512 o large.
+The "blocks" we will be talking about are 512 octets large.
 
 ## 1. The sectors.
 
