@@ -4,7 +4,7 @@ ROOT_LOCATION = 1 # root dir location
 
 # Formatting a virtual partition.
 
-def init(PATH: str) -> int:
+def init(PATH: str, size: int) -> int:
     """Initializes a virtual partition, which needs to be unmounted.
     """
     pass
