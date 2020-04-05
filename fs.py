@@ -27,22 +27,29 @@ def ls(DIR: str) -> list:
     else:
         raise SyntaxError("invalid path")
     diskfile = disk.disk(DISK)
-    diskfile.seek(ROOT_LOCATION)
-    emplacement = 1
+    emplacement = [ROOT_LOCATION]
     i = 1
     while True:
-        diskfile.seek(emplacement)
-        dir = diskfile.read(1)
+        dir = b""
+        for x in emplacement:
+            diskfile.seek(x)
+            dir += diskfile.read(1)
         data = dir.replace(b"\x00", b"").split(";".encode())
-        data[0] = data[0][1:len(data[0])]
-        data[len(data) - 1] = data[len(data) - 1][0:len(data[len(data) - 1]) - 1]
+        data = [x.split(":".encode()) for x in data]
+        for x in range(len(data)):
+            for y in range(len(data[x])):
+                if y == 1:
+                    data[x][y] = data[x][y].split("+".encode())
         for x in data:
             if path[i] == "":
-                return [x[0:-6] for x in data]
-            if path[i].encode() in x:
+                return data
+            if path[i].encode() in x and x[2] == b"0":
                 i += 1
-                emplacement = int(x[-4:-1])
+                emplacement = [int(y) for y in x[1]]
+                #print(emplacement)
                 break
+            else:
+                raise SyntaxError("invalid path")
 
 
 # Entry appending and deletion in a directory.
