@@ -1,4 +1,4 @@
-# exemple disk file :
+# sample disk file :
 
 The first block is a table where each byte represent a block. If the byte is 00, the corresponding block is free and if the byte is 01, the corresponding block is taken.
 
