@@ -38,8 +38,10 @@ class disk(object):
         """write [data] in the block of 512 o on which the cursor is.
         """
         data = data.encode()
+        if len(data) > nb_blocks*512:
+            return -1 
         if len(data) != 512 * nb_blocks:
-            data += b"\x00" * (nb_blocks * 512 - (len(data) % 512))
+            data += b"\x00" * (nb_blocks * 512 - len(data))
         try:
             f = open(self.name ,'r+b')
         except IOError:
