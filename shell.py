@@ -3,13 +3,20 @@ WORKING_DIRECTORY = "/"
 
 # ls command
 
-def ls_command(dir: str):
+def ls(dir: str):
     if dir == "":
         dir = WORKING_DIRECTORY
     dir_content = fs.ls(dir)
     for x in dir_content:
-        print(" " + x[0].decode())
-    print("")
+        if int(x[2].decode()) == 0:
+            print(" " + x[0].decode() + "/")
+        else:
+            print(" " + x[0].decode())
+
+# pwd command:
+
+def pwd():
+    print(WORKING_DIRECTORY)
 
 # cd command:
 
@@ -17,28 +24,68 @@ def cd(dir: str):
     global WORKING_DIRECTORY
     if dir == "":
         WORKING_DIRECTORY = "/"
-    else:
-        if WORKING_DIRECTORY == "/":
-            if dir[len(dir) - 1] != "/":
-                WORKING_DIRECTORY += dir + "/"
-            else:
-                WORKING_DIRECTORY += dir
+    elif dir[0] != "/":
+        if dir[len(dir) - 1] != "/":
+            WORKING_DIRECTORY += dir + "/"
         else:
-            if dir[len(dir) - 1] != "/":
-                WORKING_DIRECTORY += "/" + dir + "/"
-            else:
-                WORKING_DIRECTORY += "/" + dir
+            WORKING_DIRECTORY += dir
+    else:
+        if dir[len(dir) - 1] != "/":
+            WORKING_DIRECTORY = dir + "/"
+        else:
+            WORKING_DIRECTORY = dir
+
+# mkdir
+
+def mkdir(PATH: str, name: str):
+    dir = fs.mkdir(PATH, name)
+    if dir == 0:
+        print("directory {} sucessfully created".format(PATH + "/" + name))
+    else:
+        print("error")
+
+# rmdir
+
+def rmdir(PATH: str, name: str):
+    dir = fs.rmdir(PATH, name)
+    if dir == 0:
+        print("directory {} sucessfully remove".format(PATH + "/" + name))
+    else:
+        print("error")
 
 # main
 
 def main():
     while True:
         inp = input(WORKING_DIRECTORY + " $ ")
-        if inp[0:2] == "ls":
-            ls_command(inp[2:len(inp)])
-        elif inp[0:2] == "cd":
-            cd(inp[2:len(inp)].replace(" ", ""))
-        elif "exit" in inp:
+        cmd = inp.split()
+        if cmd[0] == "ls":
+            if len(cmd) > 1:
+                ls(cmd[1])
+            else:
+                ls("")
+        elif cmd[0] == "cd":
+            if len(cmd) > 1:
+                cd(cmd[1].replace(" ", ""))
+            else:
+                cd("")
+        elif cmd[0] == "pwd":
+            pwd()
+        elif cmd[0] == "mkdir":
+            if len(cmd) == 2:
+                mkdir(WORKING_DIRECTORY, cmd[1])
+            elif len(cmd) == 3:
+                mkdir(cmd[1], cmd[2])
+            else:
+                print("argument error")
+        elif cmd[0] == "rmdir":
+            if len(cmd) == 2:
+                rmdir(WORKING_DIRECTORY, cmd[1])
+            elif len(cmd) == 3:
+                rmdir(cmd[1], cmd[2])
+            else:
+                print("argument error")
+        elif cmd[0] == "exit":
             break
         else:
             print("error")
