@@ -1,7 +1,24 @@
 import fs
 
 WORKING_DIRECTORY = "/"
-
+COMMANDS = {
+    "ls": "liste les fichiers dans un répertoire",
+    "cd": "permet de se déplacer dans l'arborescence",
+    "pwd": "affiche le répertoire de travaille",
+    "mkdir": "créé un répertoire vide",
+    "rmdir": "supprime un répertoire",
+    "touch": "créé un fichier vide",
+    "cp": "copie un fichier",
+    "rm": "supprime un fichier",
+    "mv": "déplace un fichier",
+    "cat": "lis le contenue d'un fichier",
+    "tac": "lis le contenue d'un fichier de la fin au début",
+    "head": "lis les premières lignes d'un fichier",
+    "tail": "lis les dernières lignes d'un fichier",
+    "man": "affiche l'aide",
+    "echo": "écrit des caractères sur une sortie",
+    "exit": "quitte le shell",
+}
 # ls command
 
 
@@ -88,7 +105,7 @@ def rm(PATH: str, file: str):
 # mv
 
 
-def mv(file: str, file: str):
+def mv(file1: str, file2: str):
     pass
 
 
@@ -123,14 +140,17 @@ def tail(file: str):
 # man
 
 
-def man(cmd: str):
-    pass
+def man(cmd: str = "man"):
+    if cmd not in COMMANDS.keys():
+        print("invalid argument")
+    else:
+        print(COMMANDS[cmd])
 
 
 # echo
 
 
-def echo(msg: str, file=""):
+def echo(msg: str, file: str = "stdout"):
     pass
 
 
@@ -141,7 +161,9 @@ def main():
     while True:
         inp = input(WORKING_DIRECTORY + " $ ")
         cmd = inp.split()
-        if cmd[0] == "ls":
+        if cmd[0] not in COMMANDS.keys():
+            print("invalide command")
+        elif cmd[0] == "ls":
             if len(cmd) > 1:
                 ls(cmd[1])
             else:
@@ -167,10 +189,13 @@ def main():
                 rmdir(cmd[1], cmd[2])
             else:
                 print("argument error")
+        elif cmd[0] == "man":
+            if len(cmd) > 1:
+                man(cmd[1])
+            else:
+                man()
         elif cmd[0] == "exit":
             break
-        else:
-            print("error")
 
 
 #
