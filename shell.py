@@ -1,7 +1,9 @@
 import fs
+
 WORKING_DIRECTORY = "/"
 
 # ls command
+
 
 def ls(dir: str):
     if dir == "":
@@ -13,12 +15,16 @@ def ls(dir: str):
         else:
             print(" " + x[0].decode())
 
+
 # pwd command:
+
 
 def pwd():
     print(WORKING_DIRECTORY)
 
+
 # cd command:
+
 
 def cd(dir: str):
     global WORKING_DIRECTORY
@@ -35,7 +41,9 @@ def cd(dir: str):
         else:
             WORKING_DIRECTORY = dir
 
+
 # mkdir
+
 
 def mkdir(PATH: str, name: str):
     dir = fs.mkdir(PATH, name)
@@ -44,7 +52,9 @@ def mkdir(PATH: str, name: str):
     else:
         print("error")
 
+
 # rmdir
+
 
 def rmdir(PATH: str, name: str):
     dir = fs.rmdir(PATH, name)
@@ -53,7 +63,79 @@ def rmdir(PATH: str, name: str):
     else:
         print("error")
 
+
+# touch
+
+
+def touch(PATH: str, name: str):
+    pass
+
+
+# cp
+
+
+def cp(file: str, PATH: str):
+    pass
+
+
+# rm
+
+
+def rm(PATH: str, file: str):
+    pass
+
+
+# mv
+
+
+def mv(file: str, file: str):
+    pass
+
+
+# cat
+
+
+def cat(file: str):
+    pass
+
+
+# tac
+
+
+def tac(file: str):
+    pass
+
+
+# head
+
+
+def head(file: str):
+    pass
+
+
+# tail
+
+
+def tail(file: str):
+    pass
+
+
+# man
+
+
+def man(cmd: str):
+    pass
+
+
+# echo
+
+
+def echo(msg: str, file=""):
+    pass
+
+
 # main
+
 
 def main():
     while True:
@@ -89,6 +171,7 @@ def main():
             break
         else:
             print("error")
+
 
 #
 
