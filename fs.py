@@ -46,6 +46,7 @@ def ls(DIR: str) -> list:
     emplacement = [ROOT_LOCATION]
     i = 1
     while True:
+        exist = False
         dir = b""
         for x in emplacement:
             diskfile.seek(x)
@@ -61,10 +62,11 @@ def ls(DIR: str) -> list:
                 return data
             if path[i].encode() in x and x[2] == b"0":
                 i += 1
+                exist = True
                 emplacement = [int(y) for y in x[1]]
                 break
-            else:
-                raise SyntaxError("invalid path")
+        if exist == False:
+            raise SyntaxError("invalid path")
 
 
 # Entry appending and deletion in a directory.
