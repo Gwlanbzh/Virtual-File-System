@@ -1,6 +1,6 @@
 import disk
 
-DISK = ""  # disk location
+DISK = "~/projects/fs/disk.dsk"  # disk location
 ROOT_LOCATION = 0  # root dir location
 
 # Formatting a virtual partition.
