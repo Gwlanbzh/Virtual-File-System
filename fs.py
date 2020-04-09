@@ -18,7 +18,6 @@ def init(PATH: str, size: int) -> int:
     print(table_size)
     new_disk.write(1, table_size)
     for _ in range(size - 1):
-        new_disk.seek(new_disk.cursor + 1)
         new_disk.write(1, "")
 
 
