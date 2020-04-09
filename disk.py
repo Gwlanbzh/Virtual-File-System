@@ -2,7 +2,7 @@
 import os
 
 # code
-class disk(object):
+class Disk(object):
     def __init__(self, name: str):
         self.cursor = 0
         self.name = name
@@ -35,10 +35,9 @@ class disk(object):
             file.seek(self.cursor * 512)
             return file.read(nb_blocks * 512)
 
-    def write(self, nb_blocks: int, data: str) -> int:
+    def write(self, nb_blocks: int, data: bytes) -> int:
         """write [data] in the block of 512 o on which the cursor is.
         """
-        data = data.encode()
         if len(data) > nb_blocks * 512:
             return -1
         if len(data) != 512 * nb_blocks:
