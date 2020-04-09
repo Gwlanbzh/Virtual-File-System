@@ -9,7 +9,28 @@ ROOT_LOCATION = 0  # root dir location
 def init(PATH: str, size: int) -> int:
     """Initializes a virtual partition, which needs to be unmounted.
     """
-    pass
+    import disk
+from math import ceil
+DISK = "" # disk location
+ROOT_LOCATION = 1 # root dir location
+
+# Formatting a virtual partition.
+
+def init(PATH: str, size: int) -> int:
+    """Initializes a virtual partition, which needs to be unmounted. size is a number of blocks.
+    """
+    table_size = str(int(ceil(size / (512 * 8)))) # 512 * 8 stands for the numberof bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
+    print(table_size)
+    new_disk = disk.disk(PATH)
+    print(new_disk)
+    print(table_size)
+    new_disk.write(1, table_size)
+    for _ in range(size - 1):
+        new_disk.seek(new_disk.cursor + 1)
+        new_disk.write(1, "")
+        
+init("/home/aodren/projects/fs/inittest.disk", 5)
+
 
 
 # Mounting a virtual partition.
