@@ -26,8 +26,8 @@ jobs:
         pip install -r requirements.txt
     - name: Lint with blake
       run: |
-        pip install blake
-        python -m black .
+        pip install blak
+        python -m black --check .
     - name: Test with pytest
       run: |
         pip install pytest
