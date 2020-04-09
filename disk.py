@@ -11,7 +11,9 @@ class disk(object):
         """return the numbre of blocks of a virtual partition
         """
         file_stats = os.stat(self.name)
-        return file_stats.st_size // 512 + int(file_stats.st_size % 512 != 0)*1
+        return (
+            file_stats.st_size // 512 + int(file_stats.st_size % 512 != 0) * 1
+        )
 
     def seek(self, addr_block: int) -> int:
         """move the cursor on the [addr_block] th block of 512 o.
@@ -33,19 +35,18 @@ class disk(object):
             file.seek(self.cursor * 512)
             return file.read(nb_blocks * 512)
 
-
     def write(self, nb_blocks: int, data: str) -> int:
         """write [data] in the block of 512 o on which the cursor is.
         """
         data = data.encode()
-        if len(data) > nb_blocks*512:
-            return -1 
+        if len(data) > nb_blocks * 512:
+            return -1
         if len(data) != 512 * nb_blocks:
             data += b"\x00" * (nb_blocks * 512 - len(data))
         try:
-            f = open(self.name ,'r+b')
+            f = open(self.name, "r+b")
         except IOError:
-            f = open(self.name ,'wb')
+            f = open(self.name, "wb")
         f.seek(self.cursor * 512)
         f.write(data)
         self.cursor += nb_blocks

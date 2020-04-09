@@ -1,6 +1,6 @@
 import disk
 
-DISK = "C:\\Users\\gabri\\Desktop\\disk.txt"  # disk location
+DISK = ""  # disk location
 ROOT_LOCATION = 0  # root dir location
 
 # Formatting a virtual partition.
@@ -9,7 +9,9 @@ ROOT_LOCATION = 0  # root dir location
 def init(PATH: str, size: int) -> int:
     """Initializes a virtual partition, which needs to be unmounted.
     """
-    table_size = str(int(ceil(size / (512 * 8)))) # 512 * 8 stands for the number of bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
+    table_size = str(
+        int(ceil(size / (512 * 8)))
+    )  # 512 * 8 stands for the number of bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
     print(table_size)
     new_disk = disk.disk(PATH)
     print(new_disk)
@@ -18,7 +20,6 @@ def init(PATH: str, size: int) -> int:
     for _ in range(size - 1):
         new_disk.seek(new_disk.cursor + 1)
         new_disk.write(1, "")
-
 
 
 # Mounting a virtual partition.
@@ -85,10 +86,10 @@ def rmdir(parent_dir, NAME: str) -> int:
 
 
 class fopen(object):
-    def __init__(self, FILE: str, mode: str):
+    def __init__(self, PATH: str, mode: str):
         """Opens a file.
         """
-        self.file = FILE
+        self.path = PATH
         self.mode = mode
 
     def fclose(self) -> int:
