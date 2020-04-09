@@ -1,3 +1,5 @@
+#!usr/bin/python3.6
+
 import fs
 
 WORKING_DIRECTORY = "/"
@@ -28,9 +30,9 @@ def ls(dir: str):
     dir_content = fs.ls(dir)
     for x in dir_content:
         if int(x[2].decode()) == 0:
-            print(" " + x[0].decode() + "/")
+            print("\x1b[38:5:10m " + x[0].decode() + "/\x1b[39m")
         else:
-            print(" " + x[0].decode())
+            print("\x1b[38:5:10m " + x[0].decode() + "\x1b[39m")
 
 
 # pwd command:
@@ -159,7 +161,9 @@ def echo(msg: str, file: str = "stdout"):
 
 def main():
     while True:
-        inp = input(WORKING_DIRECTORY + " $ ")
+        inp = input(
+            "\x1b[38:5:12m" + WORKING_DIRECTORY + "\x1b[38:5:208m $ \x1b[39m"
+        )
         cmd = inp.split()
         if cmd[0] not in COMMANDS.keys():
             print("invalide command")
