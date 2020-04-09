@@ -14,7 +14,7 @@ The file system will be made of :
 
 ## 2. The allocation table.
 
-In order to allow for a variable size of disk, the allocation table must be of a variable size, proportionnal to the disk's size. In order to know how large is this table, the first byte of the first block of the allocation table is used to store this size. Since it is 1 byte, its greatest value can be 65535, so the allocation table can be 65535 blocks large at the most. So, since 1 block can store the allocation information for 4096 block, the FS can be 4096 × 65535 = 268431360 blocks large at the most. We can deduce that the maximal size of a disk is 65535 + 268431360 = **268496895** blocks large, so **137470410240** bytes large. It is quite fair.
+In order to allow for a variable size of disk, the allocation table must be of a variable size, proportionnal to the disk's size. In order to know how large is this table, the first byte of the two first blocks of the allocation table are used to store this size. Since it is 2 byte, their greatest value can be 65535, so the allocation table can be 65535 blocks large at the most. So, since 1 block can store the allocation information for 4096 block, the FS can be 4096 × 65535 = 268431360 blocks large at the most. We can deduce that the maximal size of a disk is 65535 + 268431360 = **268496895** blocks large, so **137470410240** bytes large. It is quite fair.
 
 For each block, we must know if it is allocated or not; there is a table that records this information. The table's n-th bit records the information for the n-th block the second section (root directory and others). If the block is free, the the bit is set to `1`; else, it is set to `0`.
 
