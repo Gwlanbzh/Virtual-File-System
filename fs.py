@@ -13,7 +13,7 @@ def init(PATH: str, size: int) -> int:
         int(ceil(size / (512 * 8)))
     )  # 512 * 8 stands for the number of bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
     print(table_size)
-    new_disk = disk.disk(PATH)
+    new_disk = disk.Disk(PATH)
     print(new_disk)
     print(table_size)
     new_disk.write(1, table_size)
@@ -42,7 +42,7 @@ def ls(DIR: str) -> list:
         path[0] = "/"
     else:
         raise SyntaxError("invalid path")
-    diskfile = disk.disk(DISK)
+    diskfile = disk.Disk(DISK)
     emplacement = [ROOT_LOCATION]
     i = 1
     while True:
