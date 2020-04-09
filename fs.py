@@ -18,8 +18,6 @@ def init(PATH: str, size: int) -> int:
     for _ in range(size - 1):
         new_disk.seek(new_disk.cursor + 1)
         new_disk.write(1, "")
-        
-init("/home/aodren/projects/fs/inittest.disk", 5)
 
 
 
