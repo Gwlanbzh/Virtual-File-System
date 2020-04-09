@@ -9,7 +9,7 @@ ROOT_LOCATION = 0  # root dir location
 def init(PATH: str, size: int) -> int:
     """Initializes a virtual partition, which needs to be unmounted.
     """
-    table_size = str(int(ceil(size / (512 * 8)))) # 512 * 8 stands for the numberof bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
+    table_size = str(int(ceil(size / (512 * 8)))) # 512 * 8 stands for the number of bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
     print(table_size)
     new_disk = disk.disk(PATH)
     print(new_disk)
