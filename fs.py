@@ -1,22 +1,28 @@
 import disk
-DISK = "" # disk location
-ROOT_LOCATION = 1 # root dir location
+
+DISK = "C:\\Users\\gabri\\Desktop\\disk.txt"  # disk location
+ROOT_LOCATION = 0  # root dir location
 
 # Formatting a virtual partition.
+
 
 def init(PATH: str, size: int) -> int:
     """Initializes a virtual partition, which needs to be unmounted.
     """
     pass
 
+
 # Mounting a virtual partition.
+
 
 def unmount(MNT: str) -> int:
     """Umounts the virtual partition.
     """
     pass
 
+
 # Reading a directory's content.
+
 
 def ls(DIR: str) -> list:
     """Read a directory's content.
@@ -46,7 +52,6 @@ def ls(DIR: str) -> list:
             if path[i].encode() in x and x[2] == b"0":
                 i += 1
                 emplacement = [int(y) for y in x[1]]
-                #print(emplacement)
                 break
             else:
                 raise SyntaxError("invalid path")
@@ -54,43 +59,49 @@ def ls(DIR: str) -> list:
 
 # Entry appending and deletion in a directory.
 
+
 def mkdir(parent_dir, NAME: str) -> int:
     """Creates an empty directory.
     """
     pass
+
 
 def rmdir(parent_dir, NAME: str) -> int:
     """Delete an empty directory.
     """
     pass
 
+
 # Opening and closing of a file.
 
-def fopen(FILE: str, mode: str):
-    """Opens a file.
-    """
-    pass
 
-def fclose(f) -> int:
-    """Closes a file.
-    """
-    pass
+class fopen(object):
+    def __init__(self, FILE: str, mode: str):
+        """Opens a file.
+        """
+        self.file = FILE
+        self.mode = mode
 
-# positionning the cursor to the beginning of a file.
+    def fclose(self) -> int:
+        """Closes a file.
+        """
+        pass
 
-def seek_file_beg(FILE: str) -> int:
-    """Positions the cursor at the beginning of a file.
-    """
-    pass
+    # positionning the cursor to the beginning of a file.
 
-# Reading and writing to a file.
+    def seek_file_beg(self) -> int:
+        """Positions the cursor at the beginning of a file.
+        """
+        pass
 
-def fread(f) -> bytes:
-    """Reads the file f.
-    """
-    pass
+    # Reading and writing to a file.
 
-def fwrite(f, to_write) -> int:
-    """Writes some bytes to a file.
-    """
-    pass
+    def fread(self) -> bytes:
+        """Reads the file f.
+        """
+        pass
+
+    def fwrite(self, to_write: str) -> int:
+        """Writes some bytes to a file.
+        """
+        pass
