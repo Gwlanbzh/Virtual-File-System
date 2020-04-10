@@ -1,4 +1,5 @@
 from cache import Cache
+import math
 
 DISK = "~/projects/fs/disk.dsk"  # disk location
 ROOT_LOCATION = 0  # root dir location
@@ -9,11 +10,15 @@ ROOT_LOCATION = 0  # root dir location
 def init(PATH: str, size: int) -> int:
     """Initializes a virtual partition, which needs to be unmounted.
     """
+    global DISK
     if size > 65535:
         raise ValueError("unallowed size (too large)")
-    table_size = int(ceil(size / (512 * 8))) # 512 * 8 stands for the number of bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
+    DISK = PATH
+    table_size = int(
+        math.ceil(size / (512 * 8))
+    )  # 512 * 8 stands for the number of bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
     bin_table_size = bytes([table_size // 256, table_size % 256])
-    new_disk = disk.disk(PATH)
+    new_disk = Cache(PATH)
     new_disk.write(1, bin_table_size)
     for _ in range(size - 1):
         new_disk.write(1, b"")
