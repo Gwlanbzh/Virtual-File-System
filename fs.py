@@ -89,13 +89,17 @@ def rmdir(parent_dir, NAME: str) -> int:
 
 def set_location(PATH: str, file: str, loc: list):
     dir_content = ls(PATH)
+    loc_file = None
     for x in range(len(dir_content)):
         if dir_content[x][0] == file.encode():
             loc_file = dir_content[x][1]
             break
-    if loc_file == loc:
-        return 0
-    dir_content[x][1] = loc
+    if loc_file == None:
+        dir_content.append([file.encode(), [x for x in loc], b"1"])
+    else:
+        if loc_file == loc:
+            return 0
+        dir_content[x][1] = loc
     if PATH != "/":
         dir = PATH.split("/")
         dir_name = dir[len(dir) - 2]
@@ -134,7 +138,25 @@ def set_location(PATH: str, file: str, loc: list):
 def free_block():
     """return the first block which is unused
     """
-    return 22
+    disk = Cache(DISK)
+    disk.seek(0)
+    data = disk.read(1)
+    nb_block_table = int.from_bytes(data[0:2], byteorder="big")
+    disk.seek(0)
+    data = disk.read(len(bin(nb_block_table)))
+    data = data[2 : len(data)]
+    data_bin = bin(int.from_bytes(data, byteorder="big"))
+    data_bin = str(data_bin)[2 : len(data_bin)]
+    for x in range(len(data_bin)):
+        if data_bin[x] != "1":
+            return x + len(bin(nb_block_table))
+
+
+# set a bloc to used statut
+
+
+def use_block(bloc: int):
+    pass
 
 
 # Opening and closing of a file.
@@ -150,6 +172,7 @@ class fopen(object):
         self.dir = PATH[0 : len(PATH) - len(dir[len(dir) - 1])]
         self.name = dir[len(dir) - 1]
         dir_content = ls(self.dir)
+        self.location = [str(free_block()).encode()]
         for x in dir_content:
             if x[0] == self.name.encode():
                 self.location = x[1]

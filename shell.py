@@ -121,11 +121,12 @@ def rmdir(PATH: str, name: str):
 def touch(PATH: str, name: str):
     """créé un fichier vide
     """
-    if name in fs.ls(PATH):
+    files = [x[0] for x in fs.ls(PATH)]
+    if name.encode() in files:
         print("fichier déjà existant")
         return
-    file = fs.fopen(PATH + "/" + name, "w")
-    file.fwrite("")
+    file = fs.fopen(PATH + name, "w")
+    file.fwrite(b"\x00".decode())
     file.fclose()
     print("fichier créé")
 
@@ -163,10 +164,11 @@ def mv(file1: str, file2: str):
 def cat(PATH: str, file: str):
     """lis le contenue d'un fichier
     """
-    if name not in fs.ls(PATH):
+    files = [x[0] for x in fs.ls(PATH)]
+    if file.encode() not in files:
         print("fichier non existant")
         return
-    file = fs.fopen(PATH + "/" + name, "r")
+    file = fs.fopen(PATH + "/" + file, "r")
     data = file.fread()
     file.fclose()
     print(data)
@@ -178,7 +180,15 @@ def cat(PATH: str, file: str):
 def tac(PATH: str, file: str):
     """lis le contenue d'un fichier de la fin au début
     """
-    pass
+    files = [x[0] for x in fs.ls(PATH)]
+    if file.encode() not in files:
+        print("fichier non existant")
+        return
+    file = fs.fopen(PATH + "/" + file, "r")
+    data = file.fread()
+    file.fclose()
+
+    print(data[::-1])
 
 
 # head
@@ -244,7 +254,7 @@ def main():
             "\x1b[38:5:12m" + WORKING_DIRECTORY + "\x1b[38:5:208m $ \x1b[39m"
         )
         cmd = inp.split()
-        if cmd[0] not in COMMANDS.keys():
+        if len(cmd) == 0 or cmd[0] not in COMMANDS.keys():
             print("invalide command")
         elif cmd[0] == "ls":
             if len(cmd) > 1:
@@ -277,6 +287,21 @@ def main():
                 man(cmd[1])
             else:
                 man()
+        elif cmd[0] == "touch":
+            if len(cmd) == 2:
+                touch(WORKING_DIRECTORY, cmd[1])
+            if len(cmd) == 3:
+                touch(cmd[1], cmd[2])
+        elif cmd[0] == "cat":
+            if len(cmd) == 2:
+                cat(WORKING_DIRECTORY, cmd[1])
+            if len(cmd) == 3:
+                cat(cmd[1], cmd[2])
+        elif cmd[0] == "tac":
+            if len(cmd) == 2:
+                tac(WORKING_DIRECTORY, cmd[1])
+            if len(cmd) == 3:
+                tac(cmd[1], cmd[2])
         elif cmd[0] == "exit":
             break
 
