@@ -25,6 +25,8 @@ COMMANDS = {
 
 
 def ls(dir: str):
+    """liste les fichiers dans un répertoire
+    """
     if dir == "":
         dir = WORKING_DIRECTORY
     dir_content = fs.ls(dir)
@@ -39,6 +41,8 @@ def ls(dir: str):
 
 
 def pwd():
+    """affiche le répertoire de travaille
+    """
     print(WORKING_DIRECTORY)
 
 
@@ -46,6 +50,8 @@ def pwd():
 
 
 def cd(dir: str):
+    """permet de se déplacer dans l'arborescence
+    """
     global WORKING_DIRECTORY
     if dir == "":
         WORKING_DIRECTORY = "/"
@@ -65,6 +71,8 @@ def cd(dir: str):
 
 
 def mkdir(PATH: str, name: str):
+    """créé un répertoire vide
+    """
     dir = fs.mkdir(PATH, name)
     if dir == 0:
         print("directory {} sucessfully created".format(PATH + "/" + name))
@@ -76,6 +84,8 @@ def mkdir(PATH: str, name: str):
 
 
 def rmdir(PATH: str, name: str):
+    """supprime un répertoire
+    """
     dir = fs.rmdir(PATH, name)
     if dir == 0:
         print("directory {} sucessfully remove".format(PATH + "/" + name))
@@ -87,6 +97,8 @@ def rmdir(PATH: str, name: str):
 
 
 def touch(PATH: str, name: str):
+    """créé un fichier vide
+    """
     if name in fs.ls(PATH):
         print("fichier déjà existant")
         return
@@ -100,6 +112,8 @@ def touch(PATH: str, name: str):
 
 
 def cp(file: str, PATH: str):
+    """copie un fichier
+    """
     pass
 
 
@@ -107,6 +121,8 @@ def cp(file: str, PATH: str):
 
 
 def rm(PATH: str, file: str):
+    """supprime un fichier
+    """
     pass
 
 
@@ -114,6 +130,8 @@ def rm(PATH: str, file: str):
 
 
 def mv(file1: str, file2: str):
+    """déplace un fichier
+    """
     pass
 
 
@@ -121,6 +139,8 @@ def mv(file1: str, file2: str):
 
 
 def cat(PATH: str, file: str):
+    """lis le contenue d'un fichier
+    """
     if name not in fs.ls(PATH):
         print("fichier non existant")
         return
@@ -134,6 +154,8 @@ def cat(PATH: str, file: str):
 
 
 def tac(PATH: str, file: str):
+    """lis le contenue d'un fichier de la fin au début
+    """
     pass
 
 
@@ -141,6 +163,8 @@ def tac(PATH: str, file: str):
 
 
 def head(file: str):
+    """lis les premières lignes d'un fichier
+    """
     pass
 
 
@@ -148,6 +172,8 @@ def head(file: str):
 
 
 def tail(file: str):
+    """lis les dernières lignes d'un fichier
+    """
     pass
 
 
@@ -155,6 +181,8 @@ def tail(file: str):
 
 
 def man(cmd: str = "man"):
+    """affiche l'aide
+    """
     if cmd not in COMMANDS.keys():
         print("invalid argument")
     else:
@@ -165,6 +193,8 @@ def man(cmd: str = "man"):
 
 
 def echo(msg: str, file: str = "stdout"):
+    """écrit des caractères sur une sortie
+    """
     pass
 
 
