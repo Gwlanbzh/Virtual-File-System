@@ -1,8 +1,8 @@
 from cache import Cache
 import math
 
-DISK = "~/projects/fs/disk.dsk"  # disk location
-ROOT_LOCATION = 0  # root dir location
+DISK = "C:\\Users\\gabri\\Desktop\\fs\\disk.txt"  # disk location
+ROOT_LOCATION = 5  # root dir location
 
 # Formatting a virtual partition.
 
