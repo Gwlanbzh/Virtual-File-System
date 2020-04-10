@@ -19,9 +19,7 @@ def init(PATH: str, size: int) -> int:
     )  # 512 * 8 stands for the number of bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
     bin_table_size = bytes([table_size // 256, table_size % 256])
     new_disk = Cache(PATH)
-    new_disk.write(1, bin_table_size)
-    for _ in range(size - 1):
-        new_disk.write(1, b"")
+    new_disk.write(size, bin_table_size + b"\x01")
 
 
 # Mounting a virtual partition.
