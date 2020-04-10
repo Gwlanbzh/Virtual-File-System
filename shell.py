@@ -87,7 +87,13 @@ def rmdir(PATH: str, name: str):
 
 
 def touch(PATH: str, name: str):
-    pass
+    if name in fs.ls(PATH):
+        print("fichier déjà existant")
+        return
+    file = fs.fopen(PATH + "/" + name, "w")
+    file.fwrite("")
+    file.fclose()
+    print("fichier créé")
 
 
 # cp
@@ -114,14 +120,20 @@ def mv(file1: str, file2: str):
 # cat
 
 
-def cat(file: str):
-    pass
+def cat(PATH: str, file: str):
+    if name not in fs.ls(PATH):
+        print("fichier non existant")
+        return
+    file = fs.fopen(PATH + "/" + name, "r")
+    data = file.fread()
+    file.fclose()
+    print(data)
 
 
 # tac
 
 
-def tac(file: str):
+def tac(PATH: str, file: str):
     pass
 
 
