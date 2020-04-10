@@ -1,8 +1,8 @@
 from cache import Cache
 import math
 
-DISK = "C:\\Users\\gabri\\Desktop\\fs\\disk.txt"  # disk location
-ROOT_LOCATION = 5  # root dir location
+DISK = "~/projects/fs/disk.dsk"  # disk location
+ROOT_LOCATION = 0  # root dir location
 
 # Formatting a virtual partition.
 
@@ -84,6 +84,59 @@ def rmdir(parent_dir, NAME: str) -> int:
     pass
 
 
+# set location
+
+
+def set_location(PATH: str, file: str, loc: list):
+    dir_content = ls(PATH)
+    for x in range(len(dir_content)):
+        if dir_content[x][0] == file.encode():
+            loc_file = dir_content[x][1]
+            break
+    if loc_file == loc:
+        return 0
+    dir_content[x][1] = loc
+    if PATH != "/":
+        dir = PATH.split("/")
+        dir_name = dir[len(dir) - 2]
+        up_dir = PATH[0 : len(dir_name) - 1]
+        up_dir_content = ls(up_dir)
+        for x in up_dir_content:
+            if x[0] == dir_name.encode():
+                loc_dir = x[1]
+    else:
+        loc_dir = ROOT_LOCATION
+    disk = Cache(DISK)
+    data = ""
+    for x in dir_content:
+        loc_ = ""
+        for y in x[1]:
+            loc_ += "{:0>3d}".format(int(y.decode()))
+            loc_ += "+"
+        loc_ = loc_[0 : len(loc_) - 1]
+        data += x[0].decode()
+        data += ":"
+        data += loc_
+        data += ":"
+        data += x[2].decode()
+        data += ";"
+    data = data[0 : len(data) - 1]
+    for x in range(len(data) // 512 + 1 * int(len(data) % 512 != 0)):
+        disk.seek(int(loc_dir[x].decode()))
+        disk.write(1, data[x * 512 : (x + 1) * 512 - 1].encode())
+
+    # print(loc)
+
+
+# free block
+
+
+def free_block():
+    """return the first block which is unused
+    """
+    return 22
+
+
 # Opening and closing of a file.
 
 
@@ -93,6 +146,13 @@ class fopen(object):
         """
         self.path = PATH
         self.mode = mode
+        dir = PATH.split("/")
+        self.dir = PATH[0 : len(PATH) - len(dir[len(dir) - 1])]
+        self.name = dir[len(dir) - 1]
+        dir_content = ls(self.dir)
+        for x in dir_content:
+            if x[0] == self.name.encode():
+                self.location = x[1]
 
     def fclose(self) -> int:
         """Closes a file.
@@ -111,9 +171,34 @@ class fopen(object):
     def fread(self) -> bytes:
         """Reads the file f.
         """
-        pass
+        if self.mode == "w":
+            raise Exception("file not readable")
+        disk = Cache(DISK)
+        data = b""
+        for x in self.location:
+            disk.seek(int(x.decode()))
+            data += disk.read(1)
+        return data.replace(b"\x00", b"").decode()
 
     def fwrite(self, to_write: str) -> int:
         """Writes some bytes to a file.
         """
-        pass
+        if self.mode == "r":
+            raise Exception("file not writable")
+        elif self.mode == "w":
+            disk = Cache(DISK)
+            data = to_write.encode()
+            for x in range(len(data) // 512 + 1 * int(len(data) % 512 != 0)):
+                if x < len(self.location):
+                    disk.seek(int(self.location[x].decode()))
+                    disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
+                else:
+                    print(data[x * 512 : (x + 1) * 512 - 1])
+                    bloc = free_block()
+                    self.location.append(str(bloc).encode())
+                    disk.seek(bloc)
+                    disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
+            dir_content = ls(self.dir)
+            set_location(self.dir, self.name, self.location)
+
+        return 0
