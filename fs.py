@@ -88,6 +88,8 @@ def rmdir(parent_dir, NAME: str) -> int:
 
 
 def set_location(PATH: str, file: str, loc: list):
+    for y in loc:
+        use_block(int(y.decode()))
     dir_content = ls(PATH)
     loc_file = None
     for x in range(len(dir_content)):
@@ -156,7 +158,26 @@ def free_block():
 
 
 def use_block(bloc: int):
-    pass
+    disk = Cache(DISK)
+    disk.seek(0)
+    data = disk.read(1)
+    nb_block_table_bytes = data[0:2]
+    nb_block_table = int.from_bytes(data[0:2], byteorder="big")
+    disk.seek(0)
+    data = disk.read(len(bin(nb_block_table)))
+    data = data[2 : len(data)]
+    data_bin = bin(int.from_bytes(data, byteorder="big"))
+    data_bin = str(data_bin)[2 : len(data_bin)]
+    data_bin_new = ""
+    for x in range(len(data_bin)):
+        if x != bloc - nb_block_table:
+            data_bin_new += data_bin[x]
+        else:
+            data_bin_new += "1"
+    data_bytes_new = nb_block_table_bytes
+    for x in range(len(data_bin_new) // 8):
+        data_bytes_new += bytes([int(data_bin_new[x * 8 : (x + 1) * 8], 2)])
+    disk.write(nb_block_table, data_bytes_new)
 
 
 # Opening and closing of a file.
