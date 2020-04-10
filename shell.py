@@ -27,14 +27,17 @@ COMMANDS = {
 def ls(dir: str):
     """liste les fichiers dans un répertoire
     """
-    if dir == "":
-        dir = WORKING_DIRECTORY
-    dir_content = fs.ls(dir)
-    for x in dir_content:
-        if int(x[2].decode()) == 0:
-            print("\x1b[38:5:10m " + x[0].decode() + "/\x1b[39m")
-        else:
-            print("\x1b[38:5:10m " + x[0].decode() + "\x1b[39m")
+    try:
+        if dir == "":
+            dir = WORKING_DIRECTORY
+        dir_content = fs.ls(dir)
+        for x in dir_content:
+            if int(x[2].decode()) == 0:
+                print("\x1b[38:5:10m " + x[0].decode() + "/\x1b[39m")
+            else:
+                print("\x1b[38:5:10m " + x[0].decode() + "\x1b[39m")
+    except SyntaxError as e:
+        print(e)
 
 
 # pwd command:
@@ -57,13 +60,29 @@ def cd(dir: str):
         WORKING_DIRECTORY = "/"
     elif dir[0] != "/":
         if dir[len(dir) - 1] != "/":
+            if file_exist(WORKING_DIRECTORY, dir) != 0:
+                print("dossier inexistant")
+                return
             WORKING_DIRECTORY += dir + "/"
         else:
+            if file_exist(WORKING_DIRECTORY, dir[0 : len(dir) - 1]) != 0:
+                print("dossier inexistant")
+                return
             WORKING_DIRECTORY += dir
     else:
         if dir[len(dir) - 1] != "/":
+            data = dir.split("/")
+            PATH = dir[0 : len(dir) - len(data[len(data) - 1])]
+            if file_exist(PATH, data[len(data) - 1]) != 0:
+                print("dossier inexistant")
+                return
             WORKING_DIRECTORY = dir + "/"
         else:
+            data = dir.split("/")
+            PATH = dir[0 : len(dir) - len(data[len(data) - 2]) - 1]
+            if file_exist(PATH, data[len(data) - 2]) != 0:
+                print("dossier inexistant")
+                return
             WORKING_DIRECTORY = dir
 
 
@@ -196,6 +215,21 @@ def echo(msg: str, file: str = "stdout"):
     """écrit des caractères sur une sortie
     """
     pass
+
+
+# file exist
+
+
+def file_exist(PATH: str, file: str) -> bool:
+    """retourne 0 si le fichier existe et si c'est un dossier,
+       retourne 1 si le fichier existe et si c'est un fichier,
+       retourne -1 si le fichier n'existe pas
+    """
+    dir = fs.ls(PATH)
+    for x in dir:
+        if x[0] == file.encode():
+            return int(x[2].decode())
+    return -1
 
 
 # main
