@@ -32,10 +32,13 @@ def ls(dir: str):
             dir = WORKING_DIRECTORY
         dir_content = fs.ls(dir)
         for x in dir_content:
-            if int(x[2].decode()) == 0:
-                print("\x1b[38:5:10m " + x[0].decode() + "/\x1b[39m")
+            if len(x) == 3:
+                if int(x[2].decode()) == 0:
+                    print("\x1b[38:5:10m " + x[0].decode() + "/\x1b[39m")
+                else:
+                    print("\x1b[38:5:10m " + x[0].decode() + "\x1b[39m")
             else:
-                print("\x1b[38:5:10m " + x[0].decode() + "\x1b[39m")
+                print("\x1b[38:5:10m empty dir\x1b[39m")
     except SyntaxError as e:
         print(e)
 
