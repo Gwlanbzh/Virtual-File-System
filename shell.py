@@ -253,7 +253,7 @@ def tac(PATH: str, file: str):
         data = file.fread()
         file.fclose()
         for x in data.split("\n"):
-            print(data[::-1])
+            print(x[::-1])
     except SyntaxError as e:
         print(e)
         return
@@ -265,7 +265,21 @@ def tac(PATH: str, file: str):
 def head(file: str):
     """lis les premières lignes d'un fichier
     """
-    pass
+    files = [x[0] for x in fs.ls(PATH)]
+    if file.encode() not in files:
+        print("fichier non existant")
+        return
+    try:
+        file = fs.fopen(PATH + "/" + file, "r")
+        data = file.fread()
+        file.fclose()
+        dat = data.split("\n")
+        for x in range(10):
+            if x < len(dat):
+                print(dat[x])
+    except SyntaxError as e:
+        print(e)
+        return
 
 
 # tail
@@ -274,7 +288,21 @@ def head(file: str):
 def tail(file: str):
     """lis les dernières lignes d'un fichier
     """
-    pass
+    files = [x[0] for x in fs.ls(PATH)]
+    if file.encode() not in files:
+        print("fichier non existant")
+        return
+    try:
+        file = fs.fopen(PATH + "/" + file, "r")
+        data = file.fread()
+        file.fclose()
+        dat = data.split("\n")
+        for x in range(10):
+            if x < len(dat):
+                print(dat[len(data) - x])
+    except SyntaxError as e:
+        print(e)
+        return
 
 
 # man
