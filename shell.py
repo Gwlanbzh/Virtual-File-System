@@ -264,7 +264,7 @@ def tac(PATH: str, file: str):
 # head
 
 
-def head(file: str):
+def head(PATH: str, file: str):
     """lis les premières lignes d'un fichier
     """
     files = [x[0] for x in fs.ls(PATH)]
@@ -287,7 +287,7 @@ def head(file: str):
 # tail
 
 
-def tail(file: str):
+def tail(PATH: str, file: str):
     """lis les dernières lignes d'un fichier
     """
     files = [x[0] for x in fs.ls(PATH)]
@@ -441,6 +441,20 @@ def main():
                 echo(data[0][5 : len(data[0])])
             elif len(data) == 2:
                 echo(data[0][5 : len(data[0]) - 1], data[1][1 : len(data[1])])
+            else:
+                print("argument error")
+        elif cmd[0] == "head":
+            if len(cmd) == 2:
+                head(WORKING_DIRECTORY, cmd[1])
+            elif len(cmd) == 3:
+                head(cmd[1], cmd[2])
+            else:
+                print("argument error")
+        elif cmd[0] == "tail":
+            if len(cmd) == 2:
+                tail(WORKING_DIRECTORY, cmd[1])
+            elif len(cmd) == 3:
+                tail(cmd[1], cmd[2])
             else:
                 print("argument error")
         elif cmd[0] == "exit":
