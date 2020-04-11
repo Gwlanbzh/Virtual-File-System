@@ -4,6 +4,14 @@ import math
 DISK = "~/projects/fs/disk.dsk"  # disk location
 ROOT_LOCATION = 0  # root dir location
 
+# file globals var
+
+FILE_NAME_SIZE = 10
+CHARS_ALLOWED = (
+    "AZERTYUIOPQSDFGHJKLMWXCVBNazertyuiopqsdfghjklmwxcvbn1234567890"
+)
+
+
 # Formatting a virtual partition.
 
 
@@ -78,6 +86,11 @@ def ls(DIR: str) -> list:
 def mkdir(parent_dir, NAME: str) -> int:
     """Creates an empty directory.
     """
+    if len(NAME) > FILE_NAME_SIZE:
+        raise SyntaxError("bad file name")
+    for i in NAME:
+        if i not in CHARS_ALLOWED:
+            raise SyntaxError("bad file name")
     try:
         dir_content = ls(parent_dir)
         if NAME.encode() in [x[0] for x in dir_content]:
@@ -310,6 +323,11 @@ class fopen(object):
             dir = PATH.split("/")
             self.dir = PATH[0 : len(PATH) - len(dir[len(dir) - 1])]
             self.name = dir[len(dir) - 1]
+            if len(self.name) > FILE_NAME_SIZE:
+                raise SyntaxError("bad file name")
+            for i in self.name:
+                if i not in CHARS_ALLOWED:
+                    raise SyntaxError("bad file name")
             dir_content = ls(self.dir)
             self.location = [str(free_block()).encode()]
             for x in dir_content:

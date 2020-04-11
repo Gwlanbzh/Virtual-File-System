@@ -24,7 +24,7 @@ COMMANDS = {
 # ls command
 
 
-def ls(dir: str):
+def ls(dir: str, mode=""):
     """liste les fichiers dans un répertoire
     """
     try:
@@ -36,21 +36,52 @@ def ls(dir: str):
         for x in dir_content:
             if len(x) == 3:
                 if int(x[2].decode()) == 0:
-                    print(
-                        "\x1b[38:5:10m "
-                        + x[0].decode()
-                        + "/ "
-                        + str(x[1])
-                        + "\x1b[39m"
-                    )
+                    if mode == "-d" or mode == "--debug":
+                        print(
+                            "\x1b[38:5:10m "
+                            + x[0].decode()
+                            + "/  "
+                            + " " * (10 - len(x[0].decode()) - 1)
+                            + str(x[1])
+                            + "\x1b[39m"
+                        )
+                    elif mode == "-l":
+                        print(
+                            "\x1b[38:5:10m "
+                            + x[0].decode()
+                            + "/  "
+                            + " " * (10 - len(x[0].decode()) - 1)
+                            + str(len(x[1]) * 512)
+                            + "\x1b[39m"
+                        )
+                    else:
+                        print(
+                            "\x1b[38:5:10m "
+                            + x[0].decode()
+                            + "/   "
+                            + "\x1b[39m"
+                        )
                 else:
-                    print(
-                        "\x1b[38:5:10m "
-                        + x[0].decode()
-                        + ""
-                        + str(x[1])
-                        + "\x1b[39m"
-                    )
+                    if mode == "-d" or mode == "--debug":
+                        print(
+                            "\x1b[38:5:10m "
+                            + x[0].decode()
+                            + "  "
+                            + " " * (10 - len(x[0].decode()))
+                            + str(x[1])
+                            + "\x1b[39m"
+                        )
+                    elif mode == "-l":
+                        print(
+                            "\x1b[38:5:10m "
+                            + x[0].decode()
+                            + "  "
+                            + " " * (10 - len(x[0].decode()))
+                            + str(len(x[1]) * 512)
+                            + "\x1b[39m"
+                        )
+                    else:
+                        print("\x1b[38:5:10m " + x[0].decode() + " \x1b[39m")
             else:
                 pass
     except SyntaxError as e:
@@ -77,12 +108,16 @@ def cd(dir: str):
         WORKING_DIRECTORY = "/"
     elif dir[0] != "/":
         if dir[len(dir) - 1] != "/":
-            if file_exist(WORKING_DIRECTORY, dir) != 0:
+            data = dir.split("/")
+            PATH = dir[0 : len(dir) - len(data[len(data) - 1])]
+            if file_exist(WORKING_DIRECTORY + PATH, data[len(data) - 1]) != 0:
                 print("dossier inexistant")
                 return
             WORKING_DIRECTORY += dir + "/"
         else:
-            if file_exist(WORKING_DIRECTORY, dir[0 : len(dir) - 1]) != 0:
+            data = dir.split("/")
+            PATH = dir[0 : len(dir) - len(data[len(data) - 2]) - 1]
+            if file_exist(WORKING_DIRECTORY + PATH, data[len(data) - 2]) != 0:
                 print("dossier inexistant")
                 return
             WORKING_DIRECTORY += dir
@@ -139,11 +174,14 @@ def touch(PATH: str, name: str):
     if name.encode() in files:
         print("fichier déjà existant")
         return
-
-    file = fs.fopen(PATH + name, "w")
-    file.fwrite(b"\x00".decode())
-    file.fclose()
-    print("fichier créé")
+    try:
+        file = fs.fopen(PATH + name, "w")
+        file.fwrite(b"\x00".decode())
+        file.fclose()
+        print("fichier créé")
+    except SyntaxError as e:
+        print(e)
+        return
 
 
 # cp
@@ -190,10 +228,14 @@ def cat(PATH: str, file: str):
     if file.encode() not in files:
         print("fichier non existant")
         return
-    file = fs.fopen(PATH + "/" + file, "r")
-    data = file.fread()
-    file.fclose()
-    print(data)
+    try:
+        file = fs.fopen(PATH + "/" + file, "r")
+        data = file.fread()
+        file.fclose()
+        print(data)
+    except SyntaxError as e:
+        print(e)
+        return
 
 
 # tac
@@ -206,11 +248,15 @@ def tac(PATH: str, file: str):
     if file.encode() not in files:
         print("fichier non existant")
         return
-    file = fs.fopen(PATH + "/" + file, "r")
-    data = file.fread()
-    file.fclose()
-    for x in data.split("\n"):
-        print(data[::-1])
+    try:
+        file = fs.fopen(PATH + "/" + file, "r")
+        data = file.fread()
+        file.fclose()
+        for x in data.split("\n"):
+            print(data[::-1])
+    except SyntaxError as e:
+        print(e)
+        return
 
 
 # head
@@ -293,8 +339,13 @@ def main():
         if len(cmd) == 0 or cmd[0] not in COMMANDS.keys():
             print("invalide command")
         elif cmd[0] == "ls":
-            if len(cmd) > 1:
-                ls(cmd[1])
+            if len(cmd) == 3:
+                ls(cmd[1], cmd[2])
+            elif len(cmd) == 2:
+                if cmd[1] in ("-l", "-d", "--debug"):
+                    ls("", cmd[1])
+                else:
+                    ls(cmd[1])
             else:
                 ls("")
         elif cmd[0] == "cd":
