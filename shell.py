@@ -31,14 +31,28 @@ def ls(dir: str):
         if dir == "":
             dir = WORKING_DIRECTORY
         dir_content = fs.ls(dir)
+        if dir_content == [[b""]]:
+            print("\x1b[38:5:10m empty dir\x1b[39m")
         for x in dir_content:
             if len(x) == 3:
                 if int(x[2].decode()) == 0:
-                    print("\x1b[38:5:10m " + x[0].decode() + "/\x1b[39m")
+                    print(
+                        "\x1b[38:5:10m "
+                        + x[0].decode()
+                        + "/ "
+                        + str(x[1])
+                        + "\x1b[39m"
+                    )
                 else:
-                    print("\x1b[38:5:10m " + x[0].decode() + "\x1b[39m")
+                    print(
+                        "\x1b[38:5:10m "
+                        + x[0].decode()
+                        + ""
+                        + str(x[1])
+                        + "\x1b[39m"
+                    )
             else:
-                print("\x1b[38:5:10m empty dir\x1b[39m")
+                pass
     except SyntaxError as e:
         print(e)
 
@@ -110,9 +124,9 @@ def rmdir(PATH: str, name: str):
     """
     dir = fs.rmdir(PATH, name)
     if dir == 0:
-        print("directory {} sucessfully remove".format(PATH + "/" + name))
+        print("directory {} sucessfully remove".format(PATH + name))
     else:
-        print("error")
+        print("invalid directory name or directory not empty")
 
 
 # touch
@@ -144,10 +158,17 @@ def cp(file: str, PATH: str):
 # rm
 
 
-def rm(PATH: str, file: str):
+def rm(PATH: str, file: str, mode=0):
     """supprime un fichier
     """
-    pass
+    if mode == "-s" or mode == "--secure":
+        dir = fs.rm(PATH, file, 1)
+    else:
+        dir = fs.rm(PATH, file, mode)
+    if dir == 0:
+        print("file {} sucessfully remove".format(PATH + file))
+    else:
+        print("invalid file")
 
 
 # mv
@@ -294,6 +315,19 @@ def main():
                 rmdir(WORKING_DIRECTORY, cmd[1])
             elif len(cmd) == 3:
                 rmdir(cmd[1], cmd[2])
+            else:
+                print("argument error")
+        elif cmd[0] == "rm":
+            print(cmd)
+            if len(cmd) == 2:
+                rm(WORKING_DIRECTORY, cmd[1])
+            elif len(cmd) == 3:
+                if cmd[2] == "-s" or cmd[2] == "--secure":
+                    rm(WORKING_DIRECTORY, cmd[1], cmd[2])
+                else:
+                    rm(cmd[1], cmd[2])
+            elif len(cmd) == 4:
+                rm(cmd[1], cmd[2], cmd[3])
             else:
                 print("argument error")
         elif cmd[0] == "man":

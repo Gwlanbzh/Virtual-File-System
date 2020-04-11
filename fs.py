@@ -37,6 +37,7 @@ def unmount(MNT: str) -> int:
 def ls(DIR: str) -> list:
     """Read a directory's content.
     """
+    # print("-" + DIR + "-")
     path = DIR.split("/")
     if path[0] == "" and path[len(path) - 1] == "":
         path[0] = "/"
@@ -77,7 +78,7 @@ def mkdir(parent_dir, NAME: str) -> int:
     """
     try:
         dir_content = ls(parent_dir)
-        if NAME.encode() in dir_content:
+        if NAME.encode() in [x[0] for x in dir_content]:
             return -1
         nex_loc = free_block()
         disk = Cache(DISK)
@@ -92,19 +93,108 @@ def mkdir(parent_dir, NAME: str) -> int:
 def rmdir(parent_dir, NAME: str) -> int:
     """Delete an empty directory.
     """
-    pass
+    if NAME.encode() not in [x[0] for x in ls(parent_dir)]:
+        return -1
+    if ls(parent_dir + NAME + "/") != [[b""]]:
+        return -1
+    parent_dir_content = ls(parent_dir)
+    for x in parent_dir_content:
+        if x[0] == NAME.encode():
+            loc = x[1]
+    new_parent_dir_content = [y for y in parent_dir_content if y[1] != loc]
+    disk = Cache(DISK)
+    loc_up_dir = [str(ROOT_LOCATION).encode()]
+    if parent_dir != "/":
+        up_dir = parent_dir.split("/")
+        up_dir_parent = parent_dir[
+            0 : len(parent_dir) - len(up_dir[len(up_dir) - 2]) - 1
+        ]
+        for i in ls(up_dir_parent):
+            if i[0] == up_dir[len(up_dir) - 2].encode():
+                loc_up_dir = i[1]
+    data = ""
+    for x in new_parent_dir_content:
+        if len(x) > 1:
+            loc_ = ""
+            for y in x[1]:
+                loc_ += "{:0>3d}".format(int(y.decode()))
+                loc_ += "+"
+            loc_ = loc_[0 : len(loc_) - 1]
+            data += x[0].decode()
+            data += ":"
+            data += loc_
+            data += ":"
+            data += x[2].decode()
+            data += ";"
+    data = data[0 : len(data) - 1]
+
+    for x in range(len(loc_up_dir)):
+        disk.seek(int(loc_up_dir[x].decode()))
+        disk.write(1, data[x * 512 : (x + 1) * 512].encode())
+    for x in loc:
+        use_block(int(x.decode()), "0")
+
+    # print(parent_dir_content, new_parent_dir_content)
+    return 0
 
 
 # rm
 
 
-def rm(parent_dir, NAME: str):
-    """delete a file
+def rm(parent_dir, NAME: str, mode=0):
+    """delete a file (mode 1 = secure)
     """
     try:
         ls(parent_dir)
     except SyntaxError as e:
         return -1
+    if NAME.encode() not in [x[0] for x in ls(parent_dir)]:
+        return -1
+
+    parent_dir_content = ls(parent_dir)
+    for x in parent_dir_content:
+        if x[0] == NAME.encode():
+            loc = x[1]
+    new_parent_dir_content = [y for y in parent_dir_content if y[1] != loc]
+    disk = Cache(DISK)
+    loc_up_dir = [str(ROOT_LOCATION).encode()]
+    if parent_dir != "/":
+        up_dir = parent_dir.split("/")
+        up_dir_parent = parent_dir[
+            0 : len(parent_dir) - len(up_dir[len(up_dir) - 2]) - 1
+        ]
+        for i in ls(up_dir_parent):
+            if i[0] == up_dir[len(up_dir) - 2].encode():
+                loc_up_dir = i[1]
+    data = ""
+    for x in new_parent_dir_content:
+        if len(x) > 1:
+            loc_ = ""
+            for y in x[1]:
+                loc_ += "{:0>3d}".format(int(y.decode()))
+                loc_ += "+"
+            loc_ = loc_[0 : len(loc_) - 1]
+            data += x[0].decode()
+            data += ":"
+            data += loc_
+            data += ":"
+            data += x[2].decode()
+            data += ";"
+    data = data[0 : len(data) - 1]
+
+    for x in range(len(loc_up_dir)):
+        disk.seek(int(loc_up_dir[x].decode()))
+        disk.write(1, data[x * 512 : (x + 1) * 512].encode())
+
+    if mode == 1:
+        for x in range(len(loc)):
+            disk.seek(int(loc[x].decode()))
+            disk.write(1, b"\x00")
+    for x in loc:
+        use_block(int(x.decode()), "0")
+
+    # print(parent_dir_content, new_parent_dir_content)
+    return 0
 
 
 # set location
@@ -155,6 +245,7 @@ def set_location(PATH: str, file: str, loc: list, state=b"1"):
     for x in range(len(data) // 512 + 1 * int(len(data) % 512 != 0)):
         disk.seek(int(loc_dir[x].decode()))
         disk.write(1, data[x * 512 : (x + 1) * 512 - 1].encode())
+    return 0
 
     # print(loc)
 
