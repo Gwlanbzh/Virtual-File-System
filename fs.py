@@ -329,10 +329,14 @@ class fopen(object):
                 if i not in CHARS_ALLOWED:
                     raise SyntaxError("bad file name")
             dir_content = ls(self.dir)
-            self.location = [str(free_block()).encode()]
+            self.location = [[b""]]
             for x in dir_content:
                 if x[0] == self.name.encode():
                     self.location = x[1]
+            if self.location == [[b""]]:
+                bloc = free_block()
+                self.location = [str(bloc).encode()]
+                use_block(free_block())
         except SyntaxError as e:
             raise e
 
@@ -365,6 +369,11 @@ class fopen(object):
     def fwrite(self, to_write: str) -> int:
         """Writes some bytes to a file.
         """
+        disk = Cache(DISK)
+        for x in self.location:
+            disk.seek(int(x.decode()))
+            disk.write(1, b"")
+
         if self.mode == "r":
             raise Exception("file not writable")
         elif self.mode == "w":
@@ -376,12 +385,18 @@ class fopen(object):
                     disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
                 else:
                     bloc = free_block()
+                    use_block(bloc)
                     self.location.append(str(bloc).encode())
                     disk.seek(bloc)
                     disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
+            while x < (len(self.location) - 1):
+                print(x)
+                use_block(int(self.location[x + 1].decode()), "0")
+                self.location.pop(x + 1)
+                x += 1
             dir_content = ls(self.dir)
-            for x in self.location:
-                use_block(int(x.decode()))
+            for y in self.location:
+                use_block(int(y.decode()))
             set_location(self.dir, self.name, self.location)
 
         return 0

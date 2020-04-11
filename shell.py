@@ -232,7 +232,9 @@ def cat(PATH: str, file: str):
         file = fs.fopen(PATH + "/" + file, "r")
         data = file.fread()
         file.fclose()
-        print(data)
+        for x in data.split("\\n"):
+            print(x)
+        # print(data)
     except SyntaxError as e:
         print(e)
         return
@@ -252,7 +254,7 @@ def tac(PATH: str, file: str):
         file = fs.fopen(PATH + "/" + file, "r")
         data = file.fread()
         file.fclose()
-        for x in data.split("\n"):
+        for x in data.split("\\n"):
             print(x[::-1])
     except SyntaxError as e:
         print(e)
@@ -273,7 +275,7 @@ def head(file: str):
         file = fs.fopen(PATH + "/" + file, "r")
         data = file.fread()
         file.fclose()
-        dat = data.split("\n")
+        dat = data.split("\\n")
         for x in range(10):
             if x < len(dat):
                 print(dat[x])
@@ -296,7 +298,7 @@ def tail(file: str):
         file = fs.fopen(PATH + "/" + file, "r")
         data = file.fread()
         file.fclose()
-        dat = data.split("\n")
+        dat = data.split("\\n")
         for x in range(10):
             if x < len(dat):
                 print(dat[len(data) - x])
