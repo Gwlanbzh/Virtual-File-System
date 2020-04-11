@@ -97,7 +97,7 @@ def mkdir(PATH: str, name: str):
     """
     dir = fs.mkdir(PATH, name)
     if dir == 0:
-        print("directory {} sucessfully created".format(PATH + "/" + name))
+        print("directory {} sucessfully created".format(PATH + name))
     else:
         print("error")
 
@@ -125,6 +125,7 @@ def touch(PATH: str, name: str):
     if name.encode() in files:
         print("fichier déjà existant")
         return
+
     file = fs.fopen(PATH + name, "w")
     file.fwrite(b"\x00".decode())
     file.fclose()
@@ -187,8 +188,8 @@ def tac(PATH: str, file: str):
     file = fs.fopen(PATH + "/" + file, "r")
     data = file.fread()
     file.fclose()
-
-    print(data[::-1])
+    for x in data.split("\n"):
+        print(data[::-1])
 
 
 # head
@@ -224,10 +225,23 @@ def man(cmd: str = "man"):
 # echo
 
 
-def echo(msg: str, file: str = "stdout"):
+def echo(msg: str, sortie: str = "stdout"):
     """écrit des caractères sur une sortie
     """
-    pass
+    try:
+        if sortie == "stdout":
+            print(msg)
+        else:
+            if sortie[0] == "/":
+                file = fs.fopen(sortie, "w")
+                file.fwrite(msg)
+                file.fclose()
+            else:
+                file = fs.fopen(WORKING_DIRECTORY + sortie, "w")
+                file.fwrite(msg)
+                file.fclose()
+    except SyntaxError as e:
+        print("le dossier n'existe pas")
 
 
 # file exist
@@ -302,6 +316,14 @@ def main():
                 tac(WORKING_DIRECTORY, cmd[1])
             if len(cmd) == 3:
                 tac(cmd[1], cmd[2])
+        elif cmd[0] == "echo":
+            data = inp.split(">")
+            if len(data) == 1:
+                echo(data[0][5 : len(data[0])])
+            elif len(data) == 2:
+                echo(data[0][5 : len(data[0]) - 1], data[1][1 : len(data[1])])
+            else:
+                print("argument error")
         elif cmd[0] == "exit":
             break
 

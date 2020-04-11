@@ -41,7 +41,7 @@ def ls(DIR: str) -> list:
     if path[0] == "" and path[len(path) - 1] == "":
         path[0] = "/"
     else:
-        raise SyntaxError("invalid path")
+        raise SyntaxError("invalid path : " + DIR)
     diskfile = Cache(DISK)
     emplacement = [ROOT_LOCATION]
     i = 1
@@ -66,7 +66,7 @@ def ls(DIR: str) -> list:
                 emplacement = [int(y) for y in x[1]]
                 break
         if exist == False:
-            raise SyntaxError("invalid path")
+            raise SyntaxError("invalid path : " + DIR)
 
 
 # Entry appending and deletion in a directory.
@@ -75,7 +75,18 @@ def ls(DIR: str) -> list:
 def mkdir(parent_dir, NAME: str) -> int:
     """Creates an empty directory.
     """
-    pass
+    try:
+        dir_content = ls(parent_dir)
+        if NAME.encode() in dir_content:
+            return -1
+        nex_loc = free_block()
+        disk = Cache(DISK)
+        disk.seek(nex_loc)
+        disk.write(1, "".encode())
+        set_location(parent_dir, NAME, [str(nex_loc).encode()], b"0")
+        return 0
+    except SyntaxError as e:
+        return -1
 
 
 def rmdir(parent_dir, NAME: str) -> int:
@@ -84,10 +95,22 @@ def rmdir(parent_dir, NAME: str) -> int:
     pass
 
 
+# rm
+
+
+def rm(parent_dir, NAME: str):
+    """delete a file
+    """
+    try:
+        ls(parent_dir)
+    except SyntaxError as e:
+        return -1
+
+
 # set location
 
 
-def set_location(PATH: str, file: str, loc: list):
+def set_location(PATH: str, file: str, loc: list, state=b"1"):
     for y in loc:
         use_block(int(y.decode()))
     dir_content = ls(PATH)
@@ -97,7 +120,7 @@ def set_location(PATH: str, file: str, loc: list):
             loc_file = dir_content[x][1]
             break
     if loc_file == None:
-        dir_content.append([file.encode(), [x for x in loc], b"1"])
+        dir_content.append([file.encode(), [x for x in loc], state])
     else:
         if loc_file == loc:
             return 0
@@ -105,7 +128,7 @@ def set_location(PATH: str, file: str, loc: list):
     if PATH != "/":
         dir = PATH.split("/")
         dir_name = dir[len(dir) - 2]
-        up_dir = PATH[0 : len(dir_name) - 1]
+        up_dir = PATH[0 : len(PATH) - len(dir_name) - 1]
         up_dir_content = ls(up_dir)
         for x in up_dir_content:
             if x[0] == dir_name.encode():
@@ -114,18 +137,20 @@ def set_location(PATH: str, file: str, loc: list):
         loc_dir = ROOT_LOCATION
     disk = Cache(DISK)
     data = ""
+    # print(dir_content)
     for x in dir_content:
-        loc_ = ""
-        for y in x[1]:
-            loc_ += "{:0>3d}".format(int(y.decode()))
-            loc_ += "+"
-        loc_ = loc_[0 : len(loc_) - 1]
-        data += x[0].decode()
-        data += ":"
-        data += loc_
-        data += ":"
-        data += x[2].decode()
-        data += ";"
+        if len(x) > 1:
+            loc_ = ""
+            for y in x[1]:
+                loc_ += "{:0>3d}".format(int(y.decode()))
+                loc_ += "+"
+            loc_ = loc_[0 : len(loc_) - 1]
+            data += x[0].decode()
+            data += ":"
+            data += loc_
+            data += ":"
+            data += x[2].decode()
+            data += ";"
     data = data[0 : len(data) - 1]
     for x in range(len(data) // 512 + 1 * int(len(data) % 512 != 0)):
         disk.seek(int(loc_dir[x].decode()))
@@ -157,7 +182,7 @@ def free_block():
 # set a bloc to used statut
 
 
-def use_block(bloc: int):
+def use_block(bloc: int, state="1"):
     disk = Cache(DISK)
     disk.seek(0)
     data = disk.read(1)
@@ -173,7 +198,7 @@ def use_block(bloc: int):
         if x != bloc - nb_block_table:
             data_bin_new += data_bin[x]
         else:
-            data_bin_new += "1"
+            data_bin_new += state
     data_bytes_new = nb_block_table_bytes
     for x in range(len(data_bin_new) // 8):
         data_bytes_new += bytes([int(data_bin_new[x * 8 : (x + 1) * 8], 2)])
@@ -187,16 +212,19 @@ class fopen(object):
     def __init__(self, PATH: str, mode: str):
         """Opens a file.
         """
-        self.path = PATH
-        self.mode = mode
-        dir = PATH.split("/")
-        self.dir = PATH[0 : len(PATH) - len(dir[len(dir) - 1])]
-        self.name = dir[len(dir) - 1]
-        dir_content = ls(self.dir)
-        self.location = [str(free_block()).encode()]
-        for x in dir_content:
-            if x[0] == self.name.encode():
-                self.location = x[1]
+        try:
+            self.path = PATH
+            self.mode = mode
+            dir = PATH.split("/")
+            self.dir = PATH[0 : len(PATH) - len(dir[len(dir) - 1])]
+            self.name = dir[len(dir) - 1]
+            dir_content = ls(self.dir)
+            self.location = [str(free_block()).encode()]
+            for x in dir_content:
+                if x[0] == self.name.encode():
+                    self.location = x[1]
+        except SyntaxError as e:
+            raise e
 
     def fclose(self) -> int:
         """Closes a file.
@@ -237,7 +265,7 @@ class fopen(object):
                     disk.seek(int(self.location[x].decode()))
                     disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
                 else:
-                    print(data[x * 512 : (x + 1) * 512 - 1])
+                    # print(data[x * 512 : (x + 1) * 512 - 1])
                     bloc = free_block()
                     self.location.append(str(bloc).encode())
                     disk.seek(bloc)
