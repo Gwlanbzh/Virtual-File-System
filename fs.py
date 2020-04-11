@@ -11,6 +11,7 @@ def init(PATH: str, size: int) -> int:
     """Initializes a virtual partition, which needs to be unmounted.
     """
     global DISK
+    global ROOT_LOCATION
     if size > 65535:
         raise ValueError("unallowed size (too large)")
     DISK = PATH
@@ -18,6 +19,7 @@ def init(PATH: str, size: int) -> int:
         math.ceil(size / (512 * 8))
     )  # 512 * 8 stands for the number of bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
     bin_table_size = bytes([table_size // 256, table_size % 256])
+    ROOT_LOCATION = table_size
     new_disk = Cache(PATH)
     new_disk.write(size, bin_table_size + b"\x80")
 
@@ -167,6 +169,7 @@ def rm(parent_dir, NAME: str, mode=0):
             if i[0] == up_dir[len(up_dir) - 2].encode():
                 loc_up_dir = i[1]
     data = ""
+    # print(loc_up_dir)
     for x in new_parent_dir_content:
         if len(x) > 1:
             loc_ = ""
@@ -181,7 +184,6 @@ def rm(parent_dir, NAME: str, mode=0):
             data += x[2].decode()
             data += ";"
     data = data[0 : len(data) - 1]
-
     for x in range(len(loc_up_dir)):
         disk.seek(int(loc_up_dir[x].decode()))
         disk.write(1, data[x * 512 : (x + 1) * 512].encode())
@@ -201,8 +203,6 @@ def rm(parent_dir, NAME: str, mode=0):
 
 
 def set_location(PATH: str, file: str, loc: list, state=b"1"):
-    for y in loc:
-        use_block(int(y.decode()))
     dir_content = ls(PATH)
     loc_file = None
     for x in range(len(dir_content)):
@@ -224,7 +224,7 @@ def set_location(PATH: str, file: str, loc: list, state=b"1"):
             if x[0] == dir_name.encode():
                 loc_dir = x[1]
     else:
-        loc_dir = ROOT_LOCATION
+        loc_dir = [str(ROOT_LOCATION).encode()]
     disk = Cache(DISK)
     data = ""
     # print(dir_content)
@@ -267,13 +267,13 @@ def free_block():
     data_bin = str(data_bin)[2 : len(data_bin)]
     for x in range(len(data_bin)):
         if data_bin[x] != "1":
-            return x + len(bin(nb_block_table))
+            return x + ROOT_LOCATION
 
 
 # set a bloc to used statut
 
 
-def use_block(bloc: int, state="1"):
+def use_block(block: int, state="1"):
     disk = Cache(DISK)
     disk.seek(0)
     data = disk.read(1)
@@ -286,14 +286,14 @@ def use_block(bloc: int, state="1"):
     data_bin = str(data_bin)[2 : len(data_bin)]
     data_bin_new = ""
     for x in range(len(data_bin)):
-        if x != bloc - nb_block_table:
+        if x != (block - ROOT_LOCATION):
             data_bin_new += data_bin[x]
         else:
             data_bin_new += state
-    data_bytes_new = nb_block_table_bytes
+    data_bytes_new = bytes([ROOT_LOCATION // 256, ROOT_LOCATION % 256])
     for x in range(len(data_bin_new) // 8):
         data_bytes_new += bytes([int(data_bin_new[x * 8 : (x + 1) * 8], 2)])
-    disk.write(nb_block_table, data_bytes_new)
+    disk.write(ROOT_LOCATION, data_bytes_new)
 
 
 # Opening and closing of a file.
@@ -356,9 +356,9 @@ class fopen(object):
                     disk.seek(int(self.location[x].decode()))
                     disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
                 else:
-                    # print(data[x * 512 : (x + 1) * 512 - 1])
                     bloc = free_block()
                     self.location.append(str(bloc).encode())
+                    use_block(bloc)
                     disk.seek(bloc)
                     disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
             dir_content = ls(self.dir)

@@ -261,6 +261,7 @@ def echo(msg: str, sortie: str = "stdout"):
                 file = fs.fopen(WORKING_DIRECTORY + sortie, "w")
                 file.fwrite(msg)
                 file.fclose()
+            print("sucess")
     except SyntaxError as e:
         print("le dossier n'existe pas")
 
@@ -318,7 +319,6 @@ def main():
             else:
                 print("argument error")
         elif cmd[0] == "rm":
-            print(cmd)
             if len(cmd) == 2:
                 rm(WORKING_DIRECTORY, cmd[1])
             elif len(cmd) == 3:
@@ -338,18 +338,22 @@ def main():
         elif cmd[0] == "touch":
             if len(cmd) == 2:
                 touch(WORKING_DIRECTORY, cmd[1])
-            if len(cmd) == 3:
+            elif len(cmd) == 3:
                 touch(cmd[1], cmd[2])
         elif cmd[0] == "cat":
             if len(cmd) == 2:
                 cat(WORKING_DIRECTORY, cmd[1])
-            if len(cmd) == 3:
+            elif len(cmd) == 3:
                 cat(cmd[1], cmd[2])
+            else:
+                print("argument error")
         elif cmd[0] == "tac":
             if len(cmd) == 2:
                 tac(WORKING_DIRECTORY, cmd[1])
-            if len(cmd) == 3:
+            elif len(cmd) == 3:
                 tac(cmd[1], cmd[2])
+            else:
+                print("argument error")
         elif cmd[0] == "echo":
             data = inp.split(">")
             if len(data) == 1:
