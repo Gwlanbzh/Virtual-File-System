@@ -83,6 +83,7 @@ def mkdir(parent_dir, NAME: str) -> int:
         if NAME.encode() in [x[0] for x in dir_content]:
             return -1
         nex_loc = free_block()
+        use_block(nex_loc)
         disk = Cache(DISK)
         disk.seek(nex_loc)
         disk.write(1, "".encode())
@@ -358,10 +359,11 @@ class fopen(object):
                 else:
                     bloc = free_block()
                     self.location.append(str(bloc).encode())
-                    use_block(bloc)
                     disk.seek(bloc)
                     disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
             dir_content = ls(self.dir)
+            for x in self.location:
+                use_block(int(x.decode()))
             set_location(self.dir, self.name, self.location)
 
         return 0
