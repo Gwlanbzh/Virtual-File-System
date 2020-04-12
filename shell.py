@@ -3,85 +3,73 @@
 import fs
 
 WORKING_DIRECTORY = "/"
-COMMANDS = {
-    "ls": "liste les fichiers dans un répertoire",
-    "cd": "permet de se déplacer dans l'arborescence",
-    "pwd": "affiche le répertoire de travaille",
-    "mkdir": "créé un répertoire vide",
-    "rmdir": "supprime un répertoire",
-    "touch": "créé un fichier vide",
-    "cp": "copie un fichier",
-    "rm": "supprime un fichier",
-    "mv": "déplace un fichier",
-    "cat": "lis le contenue d'un fichier",
-    "tac": "lis le contenue d'un fichier de la fin au début",
-    "head": "lis les premières lignes d'un fichier",
-    "tail": "lis les dernières lignes d'un fichier",
-    "man": "affiche l'aide",
-    "echo": "écrit des caractères sur une sortie",
-    "exit": "quitte le shell",
-}
+
 # ls command
 
 
-def ls(dir: str, mode=""):
-    """liste les fichiers dans un répertoire
+def ls(dir: str = "", mode=""):
+    """\x1b[1mNAME:\x1b[0m
+    ls - list directory contents
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mls\x1b[0m [FILE] [OPTION]
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    List  information  about the FILEs (the current directory by default)
+
+    Mandatory arguments to long options are mandatory for short options too.
+
+    \x1b[1m-l --long\x1b[0m
+        print more informations.
+
+    \x1b[1m-d --debug\x1b[0m
+        print files locations.
     """
     try:
         if dir == "":
             dir = WORKING_DIRECTORY
+        if dir[0] != "/":
+            path = WORKING_DIRECTORY + dir
+            if path[len(path) - 1] != "/":
+                dir = path + "/"
+            else:
+                dir = path
+        else:
+            if dir[len(dir) - 1] != "/":
+                dir += "/"
         dir_content = fs.ls(dir)
         if dir_content == [[b""]]:
             print("\x1b[38:5:10m empty dir\x1b[39m")
         for x in dir_content:
             if len(x) == 3:
-                if int(x[2].decode()) == 0:
-                    if mode == "-d" or mode == "--debug":
-                        print(
-                            "\x1b[38:5:10m "
-                            + x[0].decode()
-                            + "/  "
-                            + " " * (10 - len(x[0].decode()) - 1)
-                            + str(x[1])
-                            + "\x1b[39m"
-                        )
-                    elif mode == "-l":
-                        print(
-                            "\x1b[38:5:10m "
-                            + x[0].decode()
-                            + "/  "
-                            + " " * (10 - len(x[0].decode()) - 1)
-                            + str(len(x[1]) * 512)
-                            + "\x1b[39m"
-                        )
-                    else:
-                        print(
-                            "\x1b[38:5:10m "
-                            + x[0].decode()
-                            + "/   "
-                            + "\x1b[39m"
-                        )
+                if mode == "-d" or mode == "--debug":
+                    print(
+                        "\x1b[38:5:10m"
+                        + x[0].decode()
+                        + "/" * int(int(x[2].decode()) == 0)
+                        + "  "
+                        + " " * (10 - len(x[0].decode()) - 1)
+                        + str(x[1])
+                        + "\x1b[39m"
+                    )
+                elif mode == "-l" or mode == "--long":
+                    print(
+                        "\x1b[38:5:10m"
+                        + x[0].decode()
+                        + "/" * int(int(x[2].decode()) == 0)
+                        + "  "
+                        + " " * (10 - len(x[0].decode()) - 1)
+                        + str(len(x[1]) * 512)
+                        + "\x1b[39m"
+                    )
                 else:
-                    if mode == "-d" or mode == "--debug":
-                        print(
-                            "\x1b[38:5:10m "
-                            + x[0].decode()
-                            + "  "
-                            + " " * (10 - len(x[0].decode()))
-                            + str(x[1])
-                            + "\x1b[39m"
-                        )
-                    elif mode == "-l":
-                        print(
-                            "\x1b[38:5:10m "
-                            + x[0].decode()
-                            + "  "
-                            + " " * (10 - len(x[0].decode()))
-                            + str(len(x[1]) * 512)
-                            + "\x1b[39m"
-                        )
-                    else:
-                        print("\x1b[38:5:10m " + x[0].decode() + " \x1b[39m")
+                    print(
+                        "\x1b[38:5:10m"
+                        + x[0].decode()
+                        + "/" * int(int(x[2].decode()) == 0)
+                        + "   "
+                        + "\x1b[39m"
+                    )
             else:
                 pass
     except SyntaxError as e:
@@ -92,7 +80,14 @@ def ls(dir: str, mode=""):
 
 
 def pwd():
-    """affiche le répertoire de travaille
+    """\x1b[1mNAME:\x1b[0m
+    pwd - print name of current/working directory
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mpwd\x1b[0m
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    Print the full filename of the current working directory.
     """
     print(WORKING_DIRECTORY)
 
@@ -100,49 +95,81 @@ def pwd():
 # cd command:
 
 
-def cd(dir: str):
-    """permet de se déplacer dans l'arborescence
+def cd(dir: str = ""):
+    """\x1b[1mNAME:\x1b[0m
+    cd - change working directory
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mcd\x1b[0m [FILE]
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    Change Working directory (the default directory is /)
     """
-    global WORKING_DIRECTORY
-    if dir == "":
-        WORKING_DIRECTORY = "/"
-    elif dir[0] != "/":
-        if dir[len(dir) - 1] != "/":
-            data = dir.split("/")
-            PATH = dir[0 : len(dir) - len(data[len(data) - 1])]
-            if file_exist(WORKING_DIRECTORY + PATH, data[len(data) - 1]) != 0:
-                print("dossier inexistant")
-                return
-            WORKING_DIRECTORY += dir + "/"
+    try:
+        global WORKING_DIRECTORY
+        if dir == "" or dir == "/":
+            WORKING_DIRECTORY = "/"
+        elif dir == ".." or dir == "../":
+            if WORKING_DIRECTORY == "/":
+                pass
+            else:
+                data = WORKING_DIRECTORY.split("/")
+                PATH = WORKING_DIRECTORY[
+                    0 : len(WORKING_DIRECTORY) - len(data[len(data) - 2]) - 1
+                ]
+                WORKING_DIRECTORY = PATH
+        elif dir[0] != "/":
+            if dir[len(dir) - 1] != "/":
+                data = dir.split("/")
+                PATH = dir[0 : len(dir) - len(data[len(data) - 1])]
+                if (
+                    file_exist(WORKING_DIRECTORY + PATH, data[len(data) - 1])
+                    != 0
+                ):
+                    print("dossier inexistant")
+                    return
+                WORKING_DIRECTORY += dir + "/"
+            else:
+                data = dir.split("/")
+                PATH = dir[0 : len(dir) - len(data[len(data) - 2]) - 1]
+                if (
+                    file_exist(WORKING_DIRECTORY + PATH, data[len(data) - 2])
+                    != 0
+                ):
+                    print("dossier inexistant")
+                    return
+                WORKING_DIRECTORY += dir
         else:
-            data = dir.split("/")
-            PATH = dir[0 : len(dir) - len(data[len(data) - 2]) - 1]
-            if file_exist(WORKING_DIRECTORY + PATH, data[len(data) - 2]) != 0:
-                print("dossier inexistant")
-                return
-            WORKING_DIRECTORY += dir
-    else:
-        if dir[len(dir) - 1] != "/":
-            data = dir.split("/")
-            PATH = dir[0 : len(dir) - len(data[len(data) - 1])]
-            if file_exist(PATH, data[len(data) - 1]) != 0:
-                print("dossier inexistant")
-                return
-            WORKING_DIRECTORY = dir + "/"
-        else:
-            data = dir.split("/")
-            PATH = dir[0 : len(dir) - len(data[len(data) - 2]) - 1]
-            if file_exist(PATH, data[len(data) - 2]) != 0:
-                print("dossier inexistant")
-                return
-            WORKING_DIRECTORY = dir
+            if dir[len(dir) - 1] != "/":
+                data = dir.split("/")
+                PATH = dir[0 : len(dir) - len(data[len(data) - 1])]
+                if file_exist(PATH, data[len(data) - 1]) != 0:
+                    print("dossier inexistant")
+                    return
+                WORKING_DIRECTORY = dir + "/"
+            else:
+                data = dir.split("/")
+                PATH = dir[0 : len(dir) - len(data[len(data) - 2]) - 1]
+                if file_exist(PATH, data[len(data) - 2]) != 0:
+                    print("dossier inexistant")
+                    return
+                WORKING_DIRECTORY = dir
+    except SyntaxError as e:
+        print("dossier inexistant")
 
 
 # mkdir
 
 
 def mkdir(PATH: str, name: str):
-    """créé un répertoire vide
+    """\x1b[1mNAME:\x1b[0m
+    mkdir - make directories
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mmkdir\x1b[0m DIRECTORY
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    Create the DIRECTORY(ies), if they do not already exist.
     """
     dir = fs.mkdir(PATH, name)
     if dir == 0:
@@ -155,7 +182,14 @@ def mkdir(PATH: str, name: str):
 
 
 def rmdir(PATH: str, name: str):
-    """supprime un répertoire
+    """\x1b[1mNAME:\x1b[0m
+    rmdir - remove empty directories
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mrmdir\x1b[0m DIRECTORY
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    Remove the DIRECTORY(ies), if they are empty.
     """
     dir = fs.rmdir(PATH, name)
     if dir == 0:
@@ -168,7 +202,14 @@ def rmdir(PATH: str, name: str):
 
 
 def touch(PATH: str, name: str):
-    """créé un fichier vide
+    """\x1b[1mNAME:\x1b[0m
+    touch - change file timestamps
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mtouch\x1b[0m FILE
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    create an empty FILE
     """
     files = [x[0] for x in fs.ls(PATH)]
     if name.encode() in files:
@@ -188,7 +229,14 @@ def touch(PATH: str, name: str):
 
 
 def cp(file: str, PATH: str):
-    """copie un fichier
+    """\x1b[1mNAME:\x1b[0m
+    cp - copy files and directories
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mcp\x1b[0m SOURCE DEST
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.
     """
     pass
 
@@ -197,7 +245,14 @@ def cp(file: str, PATH: str):
 
 
 def rm(PATH: str, file: str, mode=0):
-    """supprime un fichier
+    """\x1b[1mNAME:\x1b[0m
+    rm - remove files
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mrm\x1b[0m FILE
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    removes specified file.
     """
     if mode == "-s" or mode == "--secure":
         dir = fs.rm(PATH, file, 1)
@@ -213,7 +268,14 @@ def rm(PATH: str, file: str, mode=0):
 
 
 def mv(file1: str, file2: str):
-    """déplace un fichier
+    """\x1b[1mNAME:\x1b[0m
+    mv - move (rename) files
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mmv\x1b[0m SOURCE DEST
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.
     """
     pass
 
@@ -222,14 +284,21 @@ def mv(file1: str, file2: str):
 
 
 def cat(PATH: str, file: str):
-    """lis le contenue d'un fichier
+    """\x1b[1mNAME:\x1b[0m
+    cat - print the file content on the standard output
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mcat\x1b[0m FILE
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    print the file content on the standard output.
     """
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
         print("fichier non existant")
         return
     try:
-        file = fs.fopen(PATH + "/" + file, "r")
+        file = fs.fopen(PATH + file, "r")
         data = file.fread()
         file.fclose()
         for x in data.split("\\n"):
@@ -244,18 +313,26 @@ def cat(PATH: str, file: str):
 
 
 def tac(PATH: str, file: str):
-    """lis le contenue d'un fichier de la fin au début
+    """\x1b[1mNAME:\x1b[0m
+    cat - print the file content on the standard output in reverse
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mtac\x1b[0m FILE
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    print the file content on the standard output in reverse.
     """
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
         print("fichier non existant")
         return
     try:
-        file = fs.fopen(PATH + "/" + file, "r")
+        file = fs.fopen(PATH + file, "r")
         data = file.fread()
         file.fclose()
-        for x in data.split("\\n"):
-            print(x[::-1])
+        dat = data.split("\\n")
+        for x in range(len(dat)):
+            print(dat[len(dat) - x - 1])
     except SyntaxError as e:
         print(e)
         return
@@ -265,7 +342,14 @@ def tac(PATH: str, file: str):
 
 
 def head(PATH: str, file: str):
-    """lis les premières lignes d'un fichier
+    """\x1b[1mNAME:\x1b[0m
+    head - output the first part of files
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mhead\x1b[0m FILE
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    print the first 10 lines of the file on the standard output in reverse.
     """
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
@@ -288,7 +372,14 @@ def head(PATH: str, file: str):
 
 
 def tail(PATH: str, file: str):
-    """lis les dernières lignes d'un fichier
+    """\x1b[1mNAME:\x1b[0m
+    tail - output the last part of files
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mtail\x1b[0m FILE
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    print the last 10 lines of the file on the standard output in reverse.
     """
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
@@ -307,39 +398,107 @@ def tail(PATH: str, file: str):
         return
 
 
+# echo
+
+
+def echo(msg: str, sortie: str = "stdout", mode="w"):
+    """\x1b[1mNAME:\x1b[0m
+    echo - display a line of text
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mecho\x1b[0m STRING
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    Echo the STRING(s) to standard output.
+    """
+    try:
+        if sortie == "stdout":
+            print(msg.replace("\\n", "\n"))
+        else:
+            if sortie[0] == "/":
+                file = fs.fopen(sortie, mode)
+                file.fwrite(msg.replace("\\n", "\n"))
+                file.fclose()
+            else:
+                file = fs.fopen(WORKING_DIRECTORY + sortie, mode)
+                file.fwrite(msg.replace("\\n", "\n"))
+                file.fclose()
+            print("sucess")
+    except SyntaxError as e:
+        print("le fichier n'existe pas")
+
+
+# list
+
+
+def list():
+    """\x1b[1mNAME:\x1b[0m
+    list - list all commands
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mlist\x1b[0m
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    display the list of all commands
+    """
+    for x in COMMANDS.keys():
+        print("\x1b[38:5:10m " + x + "\x1b[39m")
+
+
 # man
 
 
 def man(cmd: str = "man"):
-    """affiche l'aide
+    """\x1b[1mNAME:\x1b[0m
+    man - display help
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mman\x1b[0m COMMAND
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    display the help of the command
     """
     if cmd not in COMMANDS.keys():
         print("invalid argument")
     else:
-        print(COMMANDS[cmd])
+        print(COMMANDS[cmd].__doc__)
 
 
-# echo
+# exit
 
 
-def echo(msg: str, sortie: str = "stdout"):
-    """écrit des caractères sur une sortie
+def exit():
+    """\x1b[1mNAME:\x1b[0m
+    exit - exit shell
+
+\x1b[1mSYNOPSIS:\x1b[0m
+    \x1b[1mexit\x1b[0m
+
+\x1b[1mDESCRIPTION:\x1b[0m
+    exit the shell
     """
-    try:
-        if sortie == "stdout":
-            print(msg)
-        else:
-            if sortie[0] == "/":
-                file = fs.fopen(sortie, "w")
-                file.fwrite(msg)
-                file.fclose()
-            else:
-                file = fs.fopen(WORKING_DIRECTORY + sortie, "w")
-                file.fwrite(msg)
-                file.fclose()
-            print("sucess")
-    except SyntaxError as e:
-        print("le dossier n'existe pas")
+    pass
+
+
+COMMANDS = {
+    "ls": ls,
+    "cd": cd,
+    "pwd": pwd,
+    "mkdir": mkdir,
+    "rmdir": rmdir,
+    "touch": touch,
+    "cp": cp,
+    "rm": rm,
+    "mv": mv,
+    "cat": cat,
+    "tac": tac,
+    "head": head,
+    "tail": tail,
+    "man": man,
+    "echo": echo,
+    "list": list,
+    "exit": exit,
+}
 
 
 # file exist
@@ -436,11 +595,26 @@ def main():
             else:
                 print("argument error")
         elif cmd[0] == "echo":
-            data = inp.split(">")
+            data = inp.split(">>")
             if len(data) == 1:
+                data = inp.split(">")
+                if len(data) == 1:
+                    echo(data[0][5 : len(data[0])])
+                elif len(data) == 2:
+                    echo(
+                        data[0][5 : len(data[0]) - 1],
+                        data[1][1 : len(data[1])],
+                        "w",
+                    )
+                else:
+                    print("argument error")
                 echo(data[0][5 : len(data[0])])
             elif len(data) == 2:
-                echo(data[0][5 : len(data[0]) - 1], data[1][1 : len(data[1])])
+                echo(
+                    data[0][5 : len(data[0]) - 1],
+                    data[1][1 : len(data[1])],
+                    "a",
+                )
             else:
                 print("argument error")
         elif cmd[0] == "head":
@@ -457,7 +631,10 @@ def main():
                 tail(cmd[1], cmd[2])
             else:
                 print("argument error")
+        elif cmd[0] == "list":
+            list()
         elif cmd[0] == "exit":
+            exit()
             break
 
 

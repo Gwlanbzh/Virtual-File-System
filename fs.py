@@ -91,6 +91,8 @@ def mkdir(parent_dir, NAME: str) -> int:
     for i in NAME:
         if i not in CHARS_ALLOWED:
             raise SyntaxError("bad file name")
+    if NAME in NAME_PROHIBITED:
+        raise SyntaxError("bad file name")
     try:
         dir_content = ls(parent_dir)
         if NAME.encode() in [x[0] for x in dir_content]:
@@ -166,7 +168,10 @@ def rm(parent_dir, NAME: str, mode=0):
         return -1
     if NAME.encode() not in [x[0] for x in ls(parent_dir)]:
         return -1
-
+    for x in ls(parent_dir):
+        if x[0] == NAME.encode():
+            if x[2] == b"0":
+                return -1
     parent_dir_content = ls(parent_dir)
     for x in parent_dir_content:
         if x[0] == NAME.encode():
@@ -317,6 +322,8 @@ class fopen(object):
     def __init__(self, PATH: str, mode: str):
         """Opens a file.
         """
+        if mode not in ("r", "w", "a"):
+            raise SyntaxError("bad mode")
         try:
             self.path = PATH
             self.mode = mode
@@ -328,6 +335,8 @@ class fopen(object):
             for i in self.name:
                 if i not in CHARS_ALLOWED:
                     raise SyntaxError("bad file name")
+            if self.name in NAME_PROHIBITED:
+                raise SyntaxError("bad file name")
             dir_content = ls(self.dir)
             self.location = [[b""]]
             for x in dir_content:
@@ -357,7 +366,7 @@ class fopen(object):
     def fread(self) -> bytes:
         """Reads the file f.
         """
-        if self.mode == "w":
+        if self.mode == "w" or self.mode == "a":
             raise Exception("file not readable")
         disk = Cache(DISK)
         data = b""
@@ -369,14 +378,13 @@ class fopen(object):
     def fwrite(self, to_write: str) -> int:
         """Writes some bytes to a file.
         """
-        disk = Cache(DISK)
-        for x in self.location:
-            disk.seek(int(x.decode()))
-            disk.write(1, b"")
-
         if self.mode == "r":
             raise Exception("file not writable")
         elif self.mode == "w":
+            disk = Cache(DISK)
+            for x in self.location:
+                disk.seek(int(x.decode()))
+                disk.write(1, b"")
             disk = Cache(DISK)
             data = to_write.encode()
             for x in range(len(data) // 512 + 1 * int(len(data) % 512 != 0)):
@@ -390,7 +398,31 @@ class fopen(object):
                     disk.seek(bloc)
                     disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
             while x < (len(self.location) - 1):
-                print(x)
+                use_block(int(self.location[x + 1].decode()), "0")
+                self.location.pop(x + 1)
+                x += 1
+            dir_content = ls(self.dir)
+            for y in self.location:
+                use_block(int(y.decode()))
+            set_location(self.dir, self.name, self.location)
+        elif self.mode == "a":
+            if self.name.encode() not in [x[0] for x in ls(self.dir)]:
+                raise SyntaxError("inexistant file")
+            disk = Cache(DISK)
+            file = fopen(self.path, "r")
+            data = file.fread().encode() + to_write.encode()
+            file.fclose()
+            for x in range(len(data) // 512 + 1 * int(len(data) % 512 != 0)):
+                if x < len(self.location):
+                    disk.seek(int(self.location[x].decode()))
+                    disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
+                else:
+                    bloc = free_block()
+                    use_block(bloc)
+                    self.location.append(str(bloc).encode())
+                    disk.seek(bloc)
+                    disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
+            while x < (len(self.location) - 1):
                 use_block(int(self.location[x + 1].decode()), "0")
                 self.location.pop(x + 1)
                 x += 1
