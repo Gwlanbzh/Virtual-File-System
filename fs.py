@@ -55,7 +55,7 @@ def ls(DIR: str) -> list:
     else:
         raise SyntaxError("invalid path : " + DIR)
     diskfile = Cache(DISK)
-    emplacement = [ROOT_LOCATION]
+    emplacement = [ROOT_LOCATION + x for x in range(5)]
     i = 1
     while True:
         exist = False
@@ -132,7 +132,7 @@ def rmdir(parent_dir, NAME: str) -> int:
             loc = x[1]
     new_parent_dir_content = [y for y in parent_dir_content if y[1] != loc]
     disk = Cache(DISK)
-    loc_up_dir = [ROOT_LOCATION]
+    loc_up_dir = [ROOT_LOCATION + x for x in range(5)]
     if parent_dir != "/":
         up_dir = parent_dir.split("/")
         up_dir_parent = parent_dir[
@@ -198,7 +198,7 @@ def rm(parent_dir, NAME: str, mode=0):
             loc = x[1]
     new_parent_dir_content = [y for y in parent_dir_content if y[1] != loc]
     disk = Cache(DISK)
-    loc_up_dir = [ROOT_LOCATION]
+    loc_up_dir = [ROOT_LOCATION + x for x in range(5)]
     if parent_dir != "/":
         up_dir = parent_dir.split("/")
         up_dir_parent = parent_dir[
@@ -271,7 +271,7 @@ def set_location(PATH: str, file: str, loc: list, state=b"1"):
             if x[0] == dir_name.encode():
                 loc_dir = x[1]
     else:
-        loc_dir = [ROOT_LOCATION]
+        loc_dir = [ROOT_LOCATION + x for x in range(5)]
     disk = Cache(DISK)
     data = b""
     # print(dir_content)
@@ -323,7 +323,7 @@ def free_block():
     data_bin = str(data_bin)[2 : len(data_bin)]
     for x in range(len(data_bin)):
         if data_bin[x] != "1":
-            return x + ROOT_LOCATION
+            return x + ROOT_LOCATION + 4
 
 
 # set a bloc to used statut
