@@ -1,5 +1,6 @@
 from cache import Cache
 from math import ceil
+import string
 
 DISK = "~/projects/fs/disk.dsk"  # disk location
 ROOT_LOCATION = 0  # root dir location
@@ -7,9 +8,7 @@ ROOT_LOCATION = 0  # root dir location
 # file globals var
 
 FILE_NAME_SIZE = 10
-CHARS_ALLOWED = (
-    ".AZERTYUIOPQSDFGHJKLMWXCVBNazertyuiopqsdfghjklmwxcvbn1234567890"
-)
+CHARS_ALLOWED = string.ascii_letters + string.digits + "."
 NAME_PROHIBITED = ("..", ".")
 
 
