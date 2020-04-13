@@ -316,13 +316,13 @@ def free_block():
     data = disk.read(1)
     nb_block_table = int.from_bytes(data[0:2], byteorder="big")
     disk.seek(0)
-    data = disk.read(len(bin(nb_block_table)))
+    data = disk.read(ROOT_LOCATION)
     data = data[2 : len(data)]
     data_bin = bin(int.from_bytes(data, byteorder="big"))
     data_bin = str(data_bin)[2 : len(data_bin)]
     for x in range(len(data_bin)):
         if data_bin[x] != "1":
-            return x + ROOT_LOCATION + 4
+            return x + ROOT_LOCATION
 
 
 # set a bloc to used statut
@@ -335,7 +335,7 @@ def use_block(block: int, state="1"):
     nb_block_table_bytes = data[0:2]
     nb_block_table = int.from_bytes(data[0:2], byteorder="big")
     disk.seek(0)
-    data = disk.read(len(bin(nb_block_table)))
+    data = disk.read(ROOT_LOCATION)
     data = data[2 : len(data)]
     data_bin = bin(int.from_bytes(data, byteorder="big"))
     data_bin = str(data_bin)[2 : len(data_bin)]
