@@ -38,7 +38,7 @@ def ls(dir: str = "", mode=""):
             if dir[len(dir) - 1] != "/":
                 dir += "/"
         dir_content = fs.ls(dir)
-        if dir_content == [[b""]]:
+        if dir_content == []:
             print("\x1b[38:5:10m empty dir\x1b[39m")
         for x in dir_content:
             if len(x) == 3:
@@ -49,6 +49,7 @@ def ls(dir: str = "", mode=""):
                         + "/" * int(int(x[2].decode()) == 0)
                         + "  "
                         + " " * (10 - len(x[0].decode()) - 1)
+                        + " " * int(int(x[2].decode()) == 1)
                         + str(x[1])
                         + "\x1b[39m"
                     )
@@ -59,6 +60,7 @@ def ls(dir: str = "", mode=""):
                         + "/" * int(int(x[2].decode()) == 0)
                         + "  "
                         + " " * (10 - len(x[0].decode()) - 1)
+                        + " " * int(int(x[2].decode()) == 1)
                         + str(len(x[1]) * 512)
                         + "\x1b[39m"
                     )
@@ -253,6 +255,11 @@ def rm(PATH: str, file: str, mode=0):
 
 \x1b[1mDESCRIPTION:\x1b[0m
     removes specified file.
+
+    Mandatory arguments to long options are mandatory for short options too.
+
+    \x1b[1m-s --secure\x1b[0m
+        erase the file content
     """
     if mode == "-s" or mode == "--secure":
         dir = fs.rm(PATH, file, 1)
@@ -608,7 +615,6 @@ def main():
                     )
                 else:
                     print("argument error")
-                echo(data[0][5 : len(data[0])])
             elif len(data) == 2:
                 echo(
                     data[0][5 : len(data[0]) - 1],
