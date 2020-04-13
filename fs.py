@@ -30,7 +30,7 @@ def init(PATH: str, size: int) -> int:
     bin_table_size = bytes([table_size // 256, table_size % 256])
     ROOT_LOCATION = table_size
     new_disk = Cache(PATH)
-    new_disk.write(size, bin_table_size + b"\x80")
+    new_disk.write(size, bin_table_size + b"\xF8")
 
 
 # Mounting a virtual partition.
