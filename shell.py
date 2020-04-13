@@ -40,38 +40,57 @@ def ls(dir: str = "", mode=""):
         dir_content = fs.ls(dir)
         if dir_content == []:
             print("\x1b[38:5:10m empty dir\x1b[39m")
+        new_list = []
         for x in dir_content:
+            new_list.append([int(x[2].decode()), x[0], x[1]])
+        new_new_list = sorted(new_list)
+        for x in new_new_list:
+            # print(x)
             if len(x) == 3:
                 if mode == "-d" or mode == "--debug":
-                    print(
-                        "\x1b[38:5:10m"
-                        + x[0].decode()
-                        + "/" * int(int(x[2].decode()) == 0)
-                        + "  "
-                        + " " * (10 - len(x[0].decode()) - 1)
-                        + " " * int(int(x[2].decode()) == 1)
-                        + str(x[1])
-                        + "\x1b[39m"
-                    )
+                    if x[1].decode()[0] != ".":
+                        print(
+                            "\x1b[38:5:10m"
+                            + x[1].decode()
+                            + "/" * int(x[0] == 0)
+                            + "  "
+                            + " " * (10 - len(x[1].decode()) - 1)
+                            + " " * int(x[0] == 1)
+                            + str(x[2])
+                            + "\x1b[39m"
+                        )
                 elif mode == "-l" or mode == "--long":
+                    size = len(x[2]) * 512
+                    if x[1].decode()[0] != ".":
+                        print(
+                            "\x1b[38:5:10m"
+                            + x[1].decode()
+                            + "/" * int(x[0] == 0)
+                            + "  "
+                            + " " * (10 - len(x[1].decode()) - 1)
+                            + " " * int(x[0] == 1)
+                            + str(size)
+                            + "\x1b[39m"
+                        )
+                elif mode == "-a" or mode == "--all":
                     print(
                         "\x1b[38:5:10m"
-                        + x[0].decode()
-                        + "/" * int(int(x[2].decode()) == 0)
+                        + x[1].decode()
+                        + "/" * int(x[0] == 0)
                         + "  "
-                        + " " * (10 - len(x[0].decode()) - 1)
-                        + " " * int(int(x[2].decode()) == 1)
-                        + str(len(x[1]) * 512)
+                        + " " * (10 - len(x[1].decode()) - 1)
+                        + " " * int(x[0] == 1)
                         + "\x1b[39m"
                     )
                 else:
-                    print(
-                        "\x1b[38:5:10m"
-                        + x[0].decode()
-                        + "/" * int(int(x[2].decode()) == 0)
-                        + "   "
-                        + "\x1b[39m"
-                    )
+                    if x[1].decode()[0] != ".":
+                        print(
+                            "\x1b[38:5:10m"
+                            + x[1].decode()
+                            + "/" * int(x[0] == 0)
+                            + "   "
+                            + "\x1b[39m"
+                        )
             else:
                 pass
     except SyntaxError as e:
@@ -173,11 +192,14 @@ def mkdir(PATH: str, name: str):
 \x1b[1mDESCRIPTION:\x1b[0m
     Create the DIRECTORY(ies), if they do not already exist.
     """
-    dir = fs.mkdir(PATH, name)
-    if dir == 0:
-        print("directory {} sucessfully created".format(PATH + name))
-    else:
-        print("error")
+    try:
+        dir = fs.mkdir(PATH, name)
+        if dir == 0:
+            print("directory {} sucessfully created".format(PATH + name))
+        else:
+            print("error")
+    except SyntaxError as e:
+        print(e)
 
 
 # rmdir
@@ -538,7 +560,7 @@ def main():
             if len(cmd) == 3:
                 ls(cmd[1], cmd[2])
             elif len(cmd) == 2:
-                if cmd[1] in ("-l", "-d", "--debug"):
+                if cmd[1] in ("-l", "--long", "-d", "--debug", "-a", "--all"):
                     ls("", cmd[1])
                 else:
                     ls(cmd[1])
