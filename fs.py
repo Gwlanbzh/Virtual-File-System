@@ -1,5 +1,5 @@
 from cache import Cache
-import math
+from math import ceil
 
 DISK = "~/projects/fs/disk.dsk"  # disk location
 ROOT_LOCATION = 0  # root dir location
@@ -25,7 +25,7 @@ def init(PATH: str, size: int) -> int:
         raise ValueError("unallowed size (too large)")
     DISK = PATH
     table_size = int(
-        math.ceil(size / (512 * 8))
+        ceil(size / (512 * 8))
     )  # 512 * 8 stands for the number of bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
     bin_table_size = bytes([table_size // 256, table_size % 256])
     ROOT_LOCATION = table_size
