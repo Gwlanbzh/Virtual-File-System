@@ -4,6 +4,15 @@ import fs
 
 WORKING_DIRECTORY = "/"
 
+# unknown command
+
+
+def unknown_cmd():
+    """unknown command
+    """
+    pass
+
+
 # ls command
 
 
@@ -487,10 +496,7 @@ def man(cmd: str = "man"):
 \x1b[1mDESCRIPTION:\x1b[0m
     display the help of the command
     """
-    if cmd not in COMMANDS.keys():
-        print("invalid argument")
-    else:
-        print(COMMANDS[cmd].__doc__)
+    print(COMMANDS.get(cmd, unknown_cmd).__doc__)
 
 
 # exit
