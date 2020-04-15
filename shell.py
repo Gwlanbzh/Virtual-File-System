@@ -1,5 +1,6 @@
 #!usr/bin/env python3
 
+import argparse
 import fs
 
 WORKING_DIRECTORY = "/"
@@ -7,16 +8,16 @@ WORKING_DIRECTORY = "/"
 # unknown command
 
 
-def unknown_cmd():
+def unknown_cmd(arguments: list):
     """unknown command
     """
-    pass
+    print("invalid command")
 
 
 # ls command
 
 
-def ls(dir: str = "", mode=""):
+def ls(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     ls - list directory contents
 
@@ -34,6 +35,15 @@ def ls(dir: str = "", mode=""):
     \x1b[1m-d --debug\x1b[0m
         print files locations.
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--debug", action="store_true", default="False")
+    parser.add_argument("-l", "--long", action="store_true", default="False")
+    parser.add_argument("-a", "--all", action="store_true", default="False")
+    parser.add_argument(
+        "directory", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    dir = args.directory
     try:
         if dir == "":
             dir = WORKING_DIRECTORY
@@ -54,34 +64,9 @@ def ls(dir: str = "", mode=""):
             new_list.append([int(x[2].decode()), x[0], x[1]])
         new_new_list = sorted(new_list)
         for x in new_new_list:
-            # print(x)
             if len(x) == 3:
-                if mode == "-d" or mode == "--debug":
-                    if x[1].decode()[0] != ".":
-                        print(
-                            "\x1b[38:5:10m"
-                            + x[1].decode()
-                            + "/" * int(x[0] == 0)
-                            + "  "
-                            + " " * (10 - len(x[1].decode()) - 1)
-                            + " " * int(x[0] == 1)
-                            + str(x[2])
-                            + "\x1b[39m"
-                        )
-                elif mode == "-l" or mode == "--long":
-                    size = len(x[2]) * 512
-                    if x[1].decode()[0] != ".":
-                        print(
-                            "\x1b[38:5:10m"
-                            + x[1].decode()
-                            + "/" * int(x[0] == 0)
-                            + "  "
-                            + " " * (10 - len(x[1].decode()) - 1)
-                            + " " * int(x[0] == 1)
-                            + str(size)
-                            + "\x1b[39m"
-                        )
-                elif mode == "-a" or mode == "--all":
+                size = len(x[2]) * 512
+                if x[1].decode()[0] != "." or args.all == True:
                     print(
                         "\x1b[38:5:10m"
                         + x[1].decode()
@@ -89,19 +74,13 @@ def ls(dir: str = "", mode=""):
                         + "  "
                         + " " * (10 - len(x[1].decode()) - 1)
                         + " " * int(x[0] == 1)
+                        + str(x[2]) * int(args.debug == True)
+                        + " "
+                        * (10 - len(x[1].decode()) - 1)
+                        * int(args.debug == True)
+                        + str(size) * int(args.long == True)
                         + "\x1b[39m"
                     )
-                else:
-                    if x[1].decode()[0] != ".":
-                        print(
-                            "\x1b[38:5:10m"
-                            + x[1].decode()
-                            + "/" * int(x[0] == 0)
-                            + "   "
-                            + "\x1b[39m"
-                        )
-            else:
-                pass
     except SyntaxError as e:
         print(e)
 
@@ -109,7 +88,7 @@ def ls(dir: str = "", mode=""):
 # pwd command:
 
 
-def pwd():
+def pwd(argument: list):
     """\x1b[1mNAME:\x1b[0m
     pwd - print name of current/working directory
 
@@ -125,7 +104,7 @@ def pwd():
 # cd command:
 
 
-def cd(dir: str = ""):
+def cd(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     cd - change working directory
 
@@ -135,6 +114,13 @@ def cd(dir: str = ""):
 \x1b[1mDESCRIPTION:\x1b[0m
     Change Working directory (the default directory is /)
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "directory", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    dir = args.directory
+
     try:
         global WORKING_DIRECTORY
         if dir == "" or dir == "/":
@@ -191,7 +177,7 @@ def cd(dir: str = ""):
 # mkdir
 
 
-def mkdir(PATH: str, name: str):
+def mkdir(arguments: list):  # PATH: str, name: str):
     """\x1b[1mNAME:\x1b[0m
     mkdir - make directories
 
@@ -201,6 +187,24 @@ def mkdir(PATH: str, name: str):
 \x1b[1mDESCRIPTION:\x1b[0m
     Create the DIRECTORY(ies), if they do not already exist.
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "path", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "name", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    if args.path == "" and args.name == "":
+        print("error")
+        return
+    if args.path != "" and args.name == "":
+        PATH = WORKING_DIRECTORY
+        name = args.path
+    else:
+        PATH = args.path
+        name = args.name
+
     try:
         dir = fs.mkdir(PATH, name)
         if dir == 0:
@@ -214,7 +218,7 @@ def mkdir(PATH: str, name: str):
 # rmdir
 
 
-def rmdir(PATH: str, name: str):
+def rmdir(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     rmdir - remove empty directories
 
@@ -224,6 +228,23 @@ def rmdir(PATH: str, name: str):
 \x1b[1mDESCRIPTION:\x1b[0m
     Remove the DIRECTORY(ies), if they are empty.
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "path", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "name", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    if args.path == "" and args.name == "":
+        print("error")
+        return
+    if args.path != "" and args.name == "":
+        PATH = WORKING_DIRECTORY
+        name = args.path
+    else:
+        PATH = args.path
+        name = args.name
     dir = fs.rmdir(PATH, name)
     if dir == 0:
         print("directory {} sucessfully remove".format(PATH + name))
@@ -234,7 +255,7 @@ def rmdir(PATH: str, name: str):
 # touch
 
 
-def touch(PATH: str, name: str):
+def touch(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     touch - change file timestamps
 
@@ -244,6 +265,23 @@ def touch(PATH: str, name: str):
 \x1b[1mDESCRIPTION:\x1b[0m
     create an empty FILE
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "path", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "name", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    if args.path == "" and args.name == "":
+        print("error")
+        return
+    if args.path != "" and args.name == "":
+        PATH = WORKING_DIRECTORY
+        name = args.path
+    else:
+        PATH = args.path
+        name = args.name
     files = [x[0] for x in fs.ls(PATH)]
     if name.encode() in files:
         print("fichier déjà existant")
@@ -261,7 +299,7 @@ def touch(PATH: str, name: str):
 # cp
 
 
-def cp(file: str, PATH: str):
+def cp(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     cp - copy files and directories
 
@@ -277,7 +315,7 @@ def cp(file: str, PATH: str):
 # rm
 
 
-def rm(PATH: str, file: str, mode=0):
+def rm(arguments: list):  # PATH: str, file: str, mode=0):
     """\x1b[1mNAME:\x1b[0m
     rm - remove files
 
@@ -292,10 +330,26 @@ def rm(PATH: str, file: str, mode=0):
     \x1b[1m-s --secure\x1b[0m
         erase the file content
     """
-    if mode == "-s" or mode == "--secure":
-        dir = fs.rm(PATH, file, 1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--secure", action="store_true", default="False")
+    parser.add_argument(
+        "path", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "file", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    if args.path == "" and args.file == "":
+        print("error")
+        return
+    if args.path != "" and args.file == "":
+        PATH = WORKING_DIRECTORY
+        file = args.path
     else:
-        dir = fs.rm(PATH, file, mode)
+        PATH = args.path
+        file = args.file
+
+    dir = fs.rm(PATH, file, int(args.secure))
     if dir == 0:
         print("file {} sucessfully remove".format(PATH + file))
     else:
@@ -321,7 +375,7 @@ def mv(file1: str, file2: str):
 # cat
 
 
-def cat(PATH: str, file: str):
+def cat(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     cat - print the file content on the standard output
 
@@ -331,6 +385,23 @@ def cat(PATH: str, file: str):
 \x1b[1mDESCRIPTION:\x1b[0m
     print the file content on the standard output.
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "path", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "file", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    if args.path == "" and args.file == "":
+        print("error")
+        return
+    if args.path != "" and args.file == "":
+        PATH = WORKING_DIRECTORY
+        file = args.path
+    else:
+        PATH = args.path
+        file = args.file
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
         print("fichier non existant")
@@ -350,7 +421,7 @@ def cat(PATH: str, file: str):
 # tac
 
 
-def tac(PATH: str, file: str):
+def tac(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     cat - print the file content on the standard output in reverse
 
@@ -360,6 +431,24 @@ def tac(PATH: str, file: str):
 \x1b[1mDESCRIPTION:\x1b[0m
     print the file content on the standard output in reverse.
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "path", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "file", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    if args.path == "" and args.file == "":
+        print("error")
+        return
+    if args.path != "" and args.file == "":
+        PATH = WORKING_DIRECTORY
+        file = args.path
+    else:
+        PATH = args.path
+        file = args.file
+
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
         print("fichier non existant")
@@ -379,7 +468,7 @@ def tac(PATH: str, file: str):
 # head
 
 
-def head(PATH: str, file: str):
+def head(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     head - output the first part of files
 
@@ -389,6 +478,24 @@ def head(PATH: str, file: str):
 \x1b[1mDESCRIPTION:\x1b[0m
     print the first 10 lines of the file on the standard output in reverse.
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "path", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "file", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    if args.path == "" and args.file == "":
+        print("error")
+        return
+    if args.path != "" and args.file == "":
+        PATH = WORKING_DIRECTORY
+        file = args.path
+    else:
+        PATH = args.path
+        file = args.file
+
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
         print("fichier non existant")
@@ -409,7 +516,7 @@ def head(PATH: str, file: str):
 # tail
 
 
-def tail(PATH: str, file: str):
+def tail(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     tail - output the last part of files
 
@@ -419,6 +526,24 @@ def tail(PATH: str, file: str):
 \x1b[1mDESCRIPTION:\x1b[0m
     print the last 10 lines of the file on the standard output in reverse.
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "path", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "file", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    if args.path == "" and args.file == "":
+        print("error")
+        return
+    if args.path != "" and args.file == "":
+        PATH = WORKING_DIRECTORY
+        file = args.path
+    else:
+        PATH = args.path
+        file = args.file
+
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
         print("fichier non existant")
@@ -439,7 +564,7 @@ def tail(PATH: str, file: str):
 # echo
 
 
-def echo(msg: str, sortie: str = "stdout", mode="w"):
+def echo(arguments: list):  # msg: str, sortie: str = "stdout", mode="w"):
     """\x1b[1mNAME:\x1b[0m
     echo - display a line of text
 
@@ -449,6 +574,28 @@ def echo(msg: str, sortie: str = "stdout", mode="w"):
 \x1b[1mDESCRIPTION:\x1b[0m
     Echo the STRING(s) to standard output.
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "message", type=str, action="store", default="", nargs="*"
+    )
+    args = parser.parse_args(arguments)
+    sortie = "stdout"
+    msg = ""
+    for x in args.message:
+        msg += x
+        msg += " "
+    if args.message[len(args.message) - 2] in (">", ">>"):
+        if args.message[len(args.message) - 2] == ">":
+            mode = "w"
+        else:
+            mode = "a"
+        sortie = args.message[len(args.message) - 1]
+        msg = ""
+        for x in range(len(args.message)):
+            if x < len(args.message) - 2:
+                msg += args.message[x]
+                msg += " "
+
     try:
         if sortie == "stdout":
             print(msg.replace("\\n", "\n"))
@@ -463,13 +610,13 @@ def echo(msg: str, sortie: str = "stdout", mode="w"):
                 file.fclose()
             print("sucess")
     except SyntaxError as e:
-        print("le fichier n'existe pas")
+        print(e)
 
 
 # list
 
 
-def list():
+def list(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     list - list all commands
 
@@ -486,7 +633,7 @@ def list():
 # man
 
 
-def man(cmd: str = "man"):
+def man(arguments: list):
     """\x1b[1mNAME:\x1b[0m
     man - display help
 
@@ -496,7 +643,12 @@ def man(cmd: str = "man"):
 \x1b[1mDESCRIPTION:\x1b[0m
     display the help of the command
     """
-    print(COMMANDS.get(cmd, unknown_cmd).__doc__)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "cmd", type=str, action="store", default="man", nargs="?"
+    )
+    args = parser.parse_args(arguments)
+    print(COMMANDS.get(args.cmd, unknown_cmd).__doc__)
 
 
 # exit
@@ -560,116 +712,10 @@ def main():
             "\x1b[38:5:12m" + WORKING_DIRECTORY + "\x1b[38:5:208m $ \x1b[39m"
         )
         cmd = inp.split()
-        if len(cmd) == 0 or cmd[0] not in COMMANDS.keys():
-            print("invalide command")
-        elif cmd[0] == "ls":
-            if len(cmd) == 3:
-                ls(cmd[1], cmd[2])
-            elif len(cmd) == 2:
-                if cmd[1] in ("-l", "--long", "-d", "--debug", "-a", "--all"):
-                    ls("", cmd[1])
-                else:
-                    ls(cmd[1])
-            else:
-                ls("")
-        elif cmd[0] == "cd":
-            if len(cmd) > 1:
-                cd(cmd[1].replace(" ", ""))
-            else:
-                cd("")
-        elif cmd[0] == "pwd":
-            pwd()
-        elif cmd[0] == "mkdir":
-            if len(cmd) == 2:
-                mkdir(WORKING_DIRECTORY, cmd[1])
-            elif len(cmd) == 3:
-                mkdir(cmd[1], cmd[2])
-            else:
-                print("argument error")
-        elif cmd[0] == "rmdir":
-            if len(cmd) == 2:
-                rmdir(WORKING_DIRECTORY, cmd[1])
-            elif len(cmd) == 3:
-                rmdir(cmd[1], cmd[2])
-            else:
-                print("argument error")
-        elif cmd[0] == "rm":
-            if len(cmd) == 2:
-                rm(WORKING_DIRECTORY, cmd[1])
-            elif len(cmd) == 3:
-                if cmd[2] == "-s" or cmd[2] == "--secure":
-                    rm(WORKING_DIRECTORY, cmd[1], cmd[2])
-                else:
-                    rm(cmd[1], cmd[2])
-            elif len(cmd) == 4:
-                rm(cmd[1], cmd[2], cmd[3])
-            else:
-                print("argument error")
-        elif cmd[0] == "man":
-            if len(cmd) > 1:
-                man(cmd[1])
-            else:
-                man()
-        elif cmd[0] == "touch":
-            if len(cmd) == 2:
-                touch(WORKING_DIRECTORY, cmd[1])
-            elif len(cmd) == 3:
-                touch(cmd[1], cmd[2])
-        elif cmd[0] == "cat":
-            if len(cmd) == 2:
-                cat(WORKING_DIRECTORY, cmd[1])
-            elif len(cmd) == 3:
-                cat(cmd[1], cmd[2])
-            else:
-                print("argument error")
-        elif cmd[0] == "tac":
-            if len(cmd) == 2:
-                tac(WORKING_DIRECTORY, cmd[1])
-            elif len(cmd) == 3:
-                tac(cmd[1], cmd[2])
-            else:
-                print("argument error")
-        elif cmd[0] == "echo":
-            data = inp.split(">>")
-            if len(data) == 1:
-                data = inp.split(">")
-                if len(data) == 1:
-                    echo(data[0][5 : len(data[0])])
-                elif len(data) == 2:
-                    echo(
-                        data[0][5 : len(data[0]) - 1],
-                        data[1][1 : len(data[1])],
-                        "w",
-                    )
-                else:
-                    print("argument error")
-            elif len(data) == 2:
-                echo(
-                    data[0][5 : len(data[0]) - 1],
-                    data[1][1 : len(data[1])],
-                    "a",
-                )
-            else:
-                print("argument error")
-        elif cmd[0] == "head":
-            if len(cmd) == 2:
-                head(WORKING_DIRECTORY, cmd[1])
-            elif len(cmd) == 3:
-                head(cmd[1], cmd[2])
-            else:
-                print("argument error")
-        elif cmd[0] == "tail":
-            if len(cmd) == 2:
-                tail(WORKING_DIRECTORY, cmd[1])
-            elif len(cmd) == 3:
-                tail(cmd[1], cmd[2])
-            else:
-                print("argument error")
-        elif cmd[0] == "list":
-            list()
-        elif cmd[0] == "exit":
+        if cmd[0] == "exit":
             exit()
             break
+        COMMANDS.get(cmd[0], unknown_cmd)(cmd[1:])
 
 
 #

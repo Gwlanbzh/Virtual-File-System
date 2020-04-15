@@ -47,7 +47,6 @@ def unmount(MNT: str) -> int:
 def ls(DIR: str) -> list:
     """Read a directory's content.
     """
-    # print("-" + DIR + "-")
     path = DIR.split("/")
     if path[0] == "" and path[len(path) - 1] == "":
         path[0] = "/"
@@ -64,8 +63,10 @@ def ls(DIR: str) -> list:
             dir += diskfile.read(1)
         data = dir.strip(b"\x00").split(";".encode())
         data = [x.split(":".encode()) for x in data]
-        if data == [[b""]]:
+        if data == [[b""]] and i == len(path) - 1:
             return []
+        elif data == [[b""]] and i != len(path) - 1:
+            raise SyntaxError("invalid path : " + DIR)
         for x in range(len(data)):
             locs = []
             # print(data, x)
@@ -358,6 +359,7 @@ class fopen(object):
     def __init__(self, PATH: str, mode: str):
         """Opens a file.
         """
+        self.cursor = 0
         if mode not in ("r", "w", "a"):
             raise SyntaxError("bad mode")
         try:
@@ -377,6 +379,8 @@ class fopen(object):
             self.location = [[b""]]
             for x in dir_content:
                 if x[0] == self.name.encode():
+                    if x[2] == b"0":
+                        raise SyntaxError("bad file name")
                     self.location = x[1]
             if self.location == [[b""]]:
                 bloc = free_block()
@@ -395,6 +399,11 @@ class fopen(object):
     def seek_file_beg(self) -> int:
         """Positions the cursor at the beginning of a file.
         """
+        self.cursor = 0
+
+    # read a line of the file
+
+    def fread_line(self) -> bytes:
         pass
 
     # Reading and writing to a file.
