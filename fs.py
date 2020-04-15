@@ -403,15 +403,27 @@ class fopen(object):
 
     # read a line of the file
 
-    def fread_line(self) -> bytes:
-        pass
+    def freadline(self) -> bytes:
+        if self.mode != "r":
+            raise Exception("file not readable")
+        disk = Cache(DISK)
+        data = b""
+        for x in self.location:
+            disk.seek(x)
+            data += disk.read(1)
+        dat = data.strip(b"\x00").decode().split("\n")
+        self.cursor += 1
+        if self.cursor <= len(dat):
+            return dat[self.cursor - 1]
+        else:
+            return ""
 
     # Reading and writing to a file.
 
     def fread(self) -> bytes:
         """Reads the file f.
         """
-        if self.mode == "w" or self.mode == "a":
+        if self.mode != "r":
             raise Exception("file not readable")
         disk = Cache(DISK)
         data = b""

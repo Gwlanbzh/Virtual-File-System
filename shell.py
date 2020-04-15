@@ -14,6 +14,41 @@ def unknown_cmd(arguments: list):
     print("invalid command")
 
 
+# file exist
+
+
+def file_exist(PATH: str, file: str) -> bool:
+    """retourne 0 si le fichier existe et si c'est un dossier,
+       retourne 1 si le fichier existe et si c'est un fichier,
+       retourne -1 si le fichier n'existe pas
+    """
+    dir = fs.ls(PATH)
+    for x in dir:
+        if x[0] == file.encode():
+            return int(x[2].decode())
+    return -1
+
+
+# size
+
+
+def size(PATH: str, file: str) -> int:
+    dir_size = 0
+    if file_exist(PATH, file) == 0:
+        dir = fs.ls(PATH + file + "/")
+        for x in dir:
+            if x[2] == b"1":
+                dir_size += len(x[1])
+            else:
+                dir_size += size(PATH + file + "/", x[0].decode())
+    elif file_exist(PATH, file) == 1:
+        dir = fs.ls(PATH)
+        for x in dir:
+            if x[0].decode() == file:
+                return len(x[1])
+    return dir_size
+
+
 # ls command
 
 
@@ -42,7 +77,7 @@ def ls(arguments: list):
     parser.add_argument(
         "directory", type=str, action="store", default="", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     dir = args.directory
     try:
         if dir == "":
@@ -65,7 +100,7 @@ def ls(arguments: list):
         new_new_list = sorted(new_list)
         for x in new_new_list:
             if len(x) == 3:
-                size = len(x[2]) * 512
+                dir_size = size(dir, x[1].decode()) * 512
                 if x[1].decode()[0] != "." or args.all == True:
                     print(
                         "\x1b[38:5:10m"
@@ -78,7 +113,7 @@ def ls(arguments: list):
                         + " "
                         * (10 - len(x[1].decode()) - 1)
                         * int(args.debug == True)
-                        + str(size) * int(args.long == True)
+                        + (str(dir_size) + "o") * int(args.long == True)
                         + "\x1b[39m"
                     )
     except SyntaxError as e:
@@ -118,7 +153,7 @@ def cd(arguments: list):
     parser.add_argument(
         "directory", type=str, action="store", default="", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     dir = args.directory
 
     try:
@@ -194,7 +229,7 @@ def mkdir(arguments: list):  # PATH: str, name: str):
     parser.add_argument(
         "name", type=str, action="store", default="", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     if args.path == "" and args.name == "":
         print("error")
         return
@@ -235,7 +270,7 @@ def rmdir(arguments: list):
     parser.add_argument(
         "name", type=str, action="store", default="", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     if args.path == "" and args.name == "":
         print("error")
         return
@@ -272,7 +307,7 @@ def touch(arguments: list):
     parser.add_argument(
         "name", type=str, action="store", default="", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     if args.path == "" and args.name == "":
         print("error")
         return
@@ -338,7 +373,7 @@ def rm(arguments: list):  # PATH: str, file: str, mode=0):
     parser.add_argument(
         "file", type=str, action="store", default="", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     if args.path == "" and args.file == "":
         print("error")
         return
@@ -349,7 +384,7 @@ def rm(arguments: list):  # PATH: str, file: str, mode=0):
         PATH = args.path
         file = args.file
 
-    dir = fs.rm(PATH, file, int(args.secure))
+    dir = fs.rm(PATH, file, int(bool(args.secure)))
     if dir == 0:
         print("file {} sucessfully remove".format(PATH + file))
     else:
@@ -392,7 +427,7 @@ def cat(arguments: list):
     parser.add_argument(
         "file", type=str, action="store", default="", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     if args.path == "" and args.file == "":
         print("error")
         return
@@ -438,7 +473,7 @@ def tac(arguments: list):
     parser.add_argument(
         "file", type=str, action="store", default="", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     if args.path == "" and args.file == "":
         print("error")
         return
@@ -485,7 +520,7 @@ def head(arguments: list):
     parser.add_argument(
         "file", type=str, action="store", default="", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     if args.path == "" and args.file == "":
         print("error")
         return
@@ -533,7 +568,7 @@ def tail(arguments: list):
     parser.add_argument(
         "file", type=str, action="store", default="", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     if args.path == "" and args.file == "":
         print("error")
         return
@@ -555,7 +590,7 @@ def tail(arguments: list):
         dat = data.split("\\n")
         for x in range(10):
             if x < len(dat):
-                print(dat[len(data) - x])
+                print(dat[len(dat) - x - 1])
     except SyntaxError as e:
         print(e)
         return
@@ -564,7 +599,7 @@ def tail(arguments: list):
 # echo
 
 
-def echo(arguments: list):  # msg: str, sortie: str = "stdout", mode="w"):
+def echo(arguments: str):  # msg: str, sortie: str = "stdout", mode="w"):
     """\x1b[1mNAME:\x1b[0m
     echo - display a line of text
 
@@ -574,31 +609,29 @@ def echo(arguments: list):  # msg: str, sortie: str = "stdout", mode="w"):
 \x1b[1mDESCRIPTION:\x1b[0m
     Echo the STRING(s) to standard output.
     """
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "message", type=str, action="store", default="", nargs="*"
-    )
-    args = parser.parse_args(arguments)
+    args = arguments.split()
     sortie = "stdout"
     msg = ""
-    for x in args.message:
+    for x in args:
         msg += x
         msg += " "
-    if args.message[len(args.message) - 2] in (">", ">>"):
-        if args.message[len(args.message) - 2] == ">":
+    if args[len(args) - 2] in (">", ">>"):
+        if args[len(args) - 2] == ">":
             mode = "w"
         else:
             mode = "a"
-        sortie = args.message[len(args.message) - 1]
-        msg = ""
-        for x in range(len(args.message)):
-            if x < len(args.message) - 2:
-                msg += args.message[x]
-                msg += " "
+        sortie = args[len(args) - 1]
+        msg = arguments[
+            0 : len(arguments)
+            - len(args[len(args) - 2])
+            - len(args[len(args) - 1])
+            - 2
+        ]
+        # print(msg)
 
     try:
         if sortie == "stdout":
-            print(msg.replace("\\n", "\n"))
+            print(arguments.replace("\\n", "\n"))
         else:
             if sortie[0] == "/":
                 file = fs.fopen(sortie, mode)
@@ -647,7 +680,7 @@ def man(arguments: list):
     parser.add_argument(
         "cmd", type=str, action="store", default="man", nargs="?"
     )
-    args = parser.parse_args(arguments)
+    args = parser.parse_args(arguments.split())
     print(COMMANDS.get(args.cmd, unknown_cmd).__doc__)
 
 
@@ -688,21 +721,6 @@ COMMANDS = {
 }
 
 
-# file exist
-
-
-def file_exist(PATH: str, file: str) -> bool:
-    """retourne 0 si le fichier existe et si c'est un dossier,
-       retourne 1 si le fichier existe et si c'est un fichier,
-       retourne -1 si le fichier n'existe pas
-    """
-    dir = fs.ls(PATH)
-    for x in dir:
-        if x[0] == file.encode():
-            return int(x[2].decode())
-    return -1
-
-
 # main
 
 
@@ -715,7 +733,7 @@ def main():
         if cmd[0] == "exit":
             exit()
             break
-        COMMANDS.get(cmd[0], unknown_cmd)(cmd[1:])
+        COMMANDS.get(cmd[0], unknown_cmd)(inp[len(cmd[0]) + 1 :])
 
 
 #
