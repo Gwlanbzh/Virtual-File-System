@@ -32,15 +32,6 @@ def init(PATH: str, size: int) -> int:
     new_disk.write(size, bin_table_size + b"\xF8")
 
 
-# Mounting a virtual partition.
-
-
-def unmount(MNT: str) -> int:
-    """Umounts the virtual partition.
-    """
-    pass
-
-
 # Reading a directory's content.
 
 
