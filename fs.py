@@ -1,3 +1,4 @@
+#!/bin/env python3
 from cache import Cache
 from math import ceil
 import string
