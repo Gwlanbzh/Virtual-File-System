@@ -1,13 +1,33 @@
-#!usr/bin/env python3
+{1}  #!usr/bin/env python3
 
 import argparse
 import fs
+import sys
+import os
+import os.path as osp
+
+sys.path.insert(
+    0, osp.abspath(osp.join(osp.dirname(osp.abspath(__file__)), "ressource"))
+)
+import screen
 
 WORKING_DIRECTORY = "/"
+
+# docstring parameter
+
+
+def docstring_parameter(*sub):
+    def dec(obj):
+        obj.__doc__ = obj.__doc__.format(*sub)
+        return obj
+
+    return dec
+
 
 # unknown command
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def unknown_cmd(arguments: list):
     """unknown command
     """
@@ -17,6 +37,7 @@ def unknown_cmd(arguments: list):
 # file exist
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def file_exist(PATH: str, file: str) -> bool:
     """retourne 0 si le fichier existe et si c'est un dossier,
        retourne 1 si le fichier existe et si c'est un fichier,
@@ -52,22 +73,23 @@ def size(PATH: str, file: str) -> int:
 # ls command
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def ls(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     ls - list directory contents
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mls\x1b[0m [FILE] [OPTION]
+{0}SYNOPSIS:{1}
+    {0}ls{1} [FILE] [OPTION]
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     List  information  about the FILEs (the current directory by default)
 
     Mandatory arguments to long options are mandatory for short options too.
 
-    \x1b[1m-l --long\x1b[0m
+    {0}-l --long{1}
         print more informations.
 
-    \x1b[1m-d --debug\x1b[0m
+    {0}-d --debug{1}
         print files locations.
     """
     parser = argparse.ArgumentParser()
@@ -93,7 +115,7 @@ def ls(arguments: list):
                 dir += "/"
         dir_content = fs.ls(dir)
         if dir_content == []:
-            print("\x1b[38:5:10m empty dir\x1b[39m")
+            print(screen.GREEN + " empty dir" + screen.DEFAULT)
         new_list = []
         for x in dir_content:
             new_list.append([int(x[2].decode()), x[0], x[1]])
@@ -103,7 +125,7 @@ def ls(arguments: list):
                 dir_size = size(dir, x[1].decode()) * 512
                 if x[1].decode()[0] != "." or args.all == True:
                     print(
-                        "\x1b[38:5:10m"
+                        screen.GREEN
                         + x[1].decode()
                         + "/" * int(x[0] == 0)
                         + "  "
@@ -114,7 +136,7 @@ def ls(arguments: list):
                         * (10 - len(x[1].decode()) - 1)
                         * int(args.debug == True)
                         + (str(dir_size) + "o") * int(args.long == True)
-                        + "\x1b[39m"
+                        + screen.DEFAULT
                     )
     except SyntaxError as e:
         print(e)
@@ -123,14 +145,15 @@ def ls(arguments: list):
 # pwd command:
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def pwd(argument: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     pwd - print name of current/working directory
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mpwd\x1b[0m
+{0}SYNOPSIS:{1}
+    {0}pwd{1}
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     Print the full filename of the current working directory.
     """
     print(WORKING_DIRECTORY)
@@ -139,14 +162,15 @@ def pwd(argument: list):
 # cd command:
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def cd(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     cd - change working directory
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mcd\x1b[0m [FILE]
+{0}SYNOPSIS:{1}
+    {0}cd{1} [FILE]
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     Change Working directory (the default directory is /)
     """
     parser = argparse.ArgumentParser()
@@ -212,14 +236,15 @@ def cd(arguments: list):
 # mkdir
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def mkdir(arguments: list):  # PATH: str, name: str):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     mkdir - make directories
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mmkdir\x1b[0m DIRECTORY
+{0}SYNOPSIS:{1}
+    {0}mkdir{1} DIRECTORY
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     Create the DIRECTORY(ies), if they do not already exist.
     """
     parser = argparse.ArgumentParser()
@@ -253,14 +278,15 @@ def mkdir(arguments: list):  # PATH: str, name: str):
 # rmdir
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def rmdir(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     rmdir - remove empty directories
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mrmdir\x1b[0m DIRECTORY
+{0}SYNOPSIS:{1}
+    {0}rmdir{1} DIRECTORY
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     Remove the DIRECTORY(ies), if they are empty.
     """
     parser = argparse.ArgumentParser()
@@ -290,14 +316,15 @@ def rmdir(arguments: list):
 # touch
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def touch(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     touch - change file timestamps
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mtouch\x1b[0m FILE
+{0}SYNOPSIS:{1}
+    {0}touch{1} FILE
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     create an empty FILE
     """
     parser = argparse.ArgumentParser()
@@ -334,14 +361,15 @@ def touch(arguments: list):
 # cp
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def cp(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     cp - copy files and directories
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mcp\x1b[0m SOURCE DEST
+{0}SYNOPSIS:{1}
+    {0}cp{1} SOURCE DEST
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.
     """
     pass
@@ -350,19 +378,20 @@ def cp(arguments: list):
 # rm
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def rm(arguments: list):  # PATH: str, file: str, mode=0):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     rm - remove files
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mrm\x1b[0m FILE
+{0}SYNOPSIS:{1}
+    {0}rm{1} FILE
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     removes specified file.
 
     Mandatory arguments to long options are mandatory for short options too.
 
-    \x1b[1m-s --secure\x1b[0m
+    {0}-s --secure{1}
         erase the file content
     """
     parser = argparse.ArgumentParser()
@@ -394,14 +423,15 @@ def rm(arguments: list):  # PATH: str, file: str, mode=0):
 # mv
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def mv(file1: str, file2: str):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     mv - move (rename) files
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mmv\x1b[0m SOURCE DEST
+{0}SYNOPSIS:{1}
+    {0}mv{1} SOURCE DEST
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.
     """
     pass
@@ -410,14 +440,15 @@ def mv(file1: str, file2: str):
 # cat
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def cat(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     cat - print the file content on the standard output
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mcat\x1b[0m FILE
+{0}SYNOPSIS:{1}
+    {0}cat{1} FILE
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     print the file content on the standard output.
     """
     parser = argparse.ArgumentParser()
@@ -456,14 +487,15 @@ def cat(arguments: list):
 # tac
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def tac(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     cat - print the file content on the standard output in reverse
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mtac\x1b[0m FILE
+{0}SYNOPSIS:{1}
+    {0}tac{1} FILE
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     print the file content on the standard output in reverse.
     """
     parser = argparse.ArgumentParser()
@@ -503,14 +535,15 @@ def tac(arguments: list):
 # head
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def head(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     head - output the first part of files
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mhead\x1b[0m FILE
+{0}SYNOPSIS:{1}
+    {0}head{1} FILE
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     print the first 10 lines of the file on the standard output in reverse.
     """
     parser = argparse.ArgumentParser()
@@ -551,14 +584,15 @@ def head(arguments: list):
 # tail
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def tail(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     tail - output the last part of files
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mtail\x1b[0m FILE
+{0}SYNOPSIS:{1}
+    {0}tail{1} FILE
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     print the last 10 lines of the file on the standard output in reverse.
     """
     parser = argparse.ArgumentParser()
@@ -599,14 +633,15 @@ def tail(arguments: list):
 # echo
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def echo(arguments: str):  # msg: str, sortie: str = "stdout", mode="w"):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     echo - display a line of text
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mecho\x1b[0m STRING
+{0}SYNOPSIS:{1}
+    {0}echo{1} STRING
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     Echo the STRING(s) to standard output.
     """
     args = arguments.split()
@@ -649,31 +684,33 @@ def echo(arguments: str):  # msg: str, sortie: str = "stdout", mode="w"):
 # list
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def list(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     list - list all commands
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mlist\x1b[0m
+{0}SYNOPSIS:{1}
+    {0}list{1}
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     display the list of all commands
     """
     for x in COMMANDS.keys():
-        print("\x1b[38:5:10m " + x + "\x1b[39m")
+        print(screen.GREEN + x + screen.DEFAULT)
 
 
 # man
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def man(arguments: list):
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     man - display help
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mman\x1b[0m COMMAND
+{0}SYNOPSIS:{1}
+    {0}man{1} COMMAND
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     display the help of the command
     """
     parser = argparse.ArgumentParser()
@@ -687,14 +724,15 @@ def man(arguments: list):
 # exit
 
 
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def exit():
-    """\x1b[1mNAME:\x1b[0m
+    """{0}NAME:{1}
     exit - exit shell
 
-\x1b[1mSYNOPSIS:\x1b[0m
-    \x1b[1mexit\x1b[0m
+{0}SYNOPSIS:{1}
+    {0}exit{1}
 
-\x1b[1mDESCRIPTION:\x1b[0m
+{0}DESCRIPTION:{1}
     exit the shell
     """
     pass
@@ -727,7 +765,11 @@ COMMANDS = {
 def main():
     while True:
         inp = input(
-            "\x1b[38:5:12m" + WORKING_DIRECTORY + "\x1b[38:5:208m $ \x1b[39m"
+            screen.BLUE
+            + WORKING_DIRECTORY
+            + screen.ORANGE
+            + " $ "
+            + screen.DEFAULT
         )
         cmd = inp.split()
         if cmd[0] == "exit":
