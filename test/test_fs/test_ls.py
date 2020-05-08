@@ -28,7 +28,6 @@ class TestFsInit(object):
         fs.init(filename, 500)
         content = fs.ls("/")
         assert content == []
-        os.remove(filename)
 
     def test_ls_with_dir(self):
         filename = osp.join(self.tmpdir, "test.vdk")
@@ -38,7 +37,6 @@ class TestFsInit(object):
         content = fs.ls("/")
         print(content)
         assert content == [[b"dir1", [6], b"0"], [b"dir2", [7], b"0"]]
-        os.remove(filename)
 
     def test_ls_with_files(self):
         filename = osp.join(self.tmpdir, "test.vdk")
@@ -50,4 +48,3 @@ class TestFsInit(object):
         content = fs.ls("/")
         print(content)
         assert content == [[b"file1", [6], b"1"], [b"file2", [7], b"1"]]
-        os.remove(filename)

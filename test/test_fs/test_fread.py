@@ -34,4 +34,3 @@ class TestFsInit(object):
         data2 = file2.fread()
         content = fs.ls("/")
         assert data == data2
-        os.remove(filename)

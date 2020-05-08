@@ -43,5 +43,5 @@ class TestFsInit(object):
             assert data[2:3] == b"\xf8"
             assert data[0:2] == bytes([table_size // 256, table_size % 256])
             file_stats = os.stat(filename)
-            assert file_stats.st_size == taille*512
+            assert file_stats.st_size == taille * 512
             os.remove(filename)

@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
+import raid
 from disk import Disk
 
 
 class Cache(object):
-    def __init__(self, name: str):
-        self.disk = Disk(name)
+    def __init__(self, name: str, type=""):
+        if type == "":
+            self.disk = Disk(name)
+        elif type == "raid0":
+            self.disk = raid.Raid0(name)
+        elif type == "raid1":
+            self.disk = raid.Raid1(name)
 
     def nb_blocks(self) -> int:
         return self.disk.nb_blocks()
