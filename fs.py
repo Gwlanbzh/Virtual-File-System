@@ -21,16 +21,31 @@ def init(PATH: str, size: int) -> int:
     """
     global DISK
     global ROOT_LOCATION
+    if table_size > 65535:
+        raise ValueError("unallowed size (too large)")
     DISK = PATH
     table_size = int(
         ceil(size / (512 * 8))
     )  # 512 * 8 stands for the number of bytes in a block, multiplied by the number of bits in a byte, since we use 1 bit by block.
-    if table_size > 65535:
-        raise ValueError("unallowed size (too large)")
     bin_table_size = bytes([table_size // 256, table_size % 256])
     ROOT_LOCATION = table_size
     new_disk = Cache(PATH)
     new_disk.write(size, bin_table_size + b"\xF8")  #  + b"\xF8" is here because the 5 first block are used - and allocated - for the root directory. Here begins the allocation table.
+
+
+    
+# Opening ("mounting") a virtual disk.
+
+
+def open(PATH):
+    global DISK
+    global ROOT_LOCATION
+    DISK = PATH
+    disktoopen = Cache(PATH)
+    disktoopen.seek(0)
+    first_block = disktoopen.read(1)
+    table_size = first_block[0] * 256 + first_block[1]
+    ROOT_LOCATION = table_size
 
 
 # Reading a directory's content.
