@@ -17,7 +17,7 @@ NAME_PROHIBITED = ("..", ".")
 
 
 def init(PATH: str, size: int) -> int:
-    """Initializes a virtual partition, which needs to be unmounted.
+    """Initializes a virtual partition.
     """
     global DISK
     global ROOT_LOCATION
