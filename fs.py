@@ -21,7 +21,7 @@ def init(PATH: str, size: int) -> int:
     """
     global DISK
     global ROOT_LOCATION
-    if table_size > 65535:
+    if size > 268431360:
         raise ValueError("unallowed size (too large)")
     DISK = PATH
     table_size = int(
