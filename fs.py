@@ -367,7 +367,7 @@ class fopen(object):
         """Opens a file.
         """
         self.cursor = 0
-        if mode not in ("r", "w", "a"):
+        if mode not in ("r", "w", "a", "rb", "wb", "ab"):
             raise SyntaxError("bad mode")
         try:
             self.path = PATH
@@ -411,6 +411,8 @@ class fopen(object):
     # read a line of the file
 
     def freadline(self) -> bytes:
+        if self.mode == "rb":
+            raise Exception("prohibited to use freadline in 'rb' mode")
         if self.mode != "r":
             raise Exception("file not readable")
         disk = Cache(DISK)
@@ -423,34 +425,43 @@ class fopen(object):
         if self.cursor <= len(dat):
             return dat[self.cursor - 1]
         else:
-            return ""
+            if self.mode == "r":
+                return ""
+            else:  # self.mode = "rb"
+                return b""
 
     # Reading and writing to a file.
 
     def fread(self) -> bytes:
         """Reads the file f.
         """
-        if self.mode != "r":
+        if self.mode not in ("r", "rb"):
             raise Exception("file not readable")
         disk = Cache(DISK)
         data = b""
         for x in self.location:
             disk.seek(x)
             data += disk.read(1)
-        return data.strip(b"\x00").decode()
+        if self.mode == "r":
+            return data.strip(b"\x00").decode()
+        else:  # self.mode = "rb"
+            return data.strip(b"\x00")
 
     def fwrite(self, to_write: str) -> int:
         """Writes some bytes to a file.
         """
-        if self.mode == "r":
+        if self.mode in ("r", "rb"):
             raise Exception("file not writable")
-        elif self.mode == "w":
+        elif self.mode in ("w", "wb"):
             disk = Cache(DISK)
             for x in self.location:
                 disk.seek(x)
                 disk.write(1, b"")
             disk = Cache(DISK)
-            data = to_write.encode()
+            if self.mode == "w":
+                data = to_write.encode()
+            else:  # self.mode = "wb"
+                data = to_write
             for x in range(len(data) // 512 + 1 * int(len(data) % 512 != 0)):
                 if x < len(self.location):
                     disk.seek(self.location[x])
@@ -469,12 +480,16 @@ class fopen(object):
             for y in self.location:
                 use_block(y)
             set_location(self.dir, self.name, self.location)
-        elif self.mode == "a":
+        elif self.mode in ("a", "ab"):
             if self.name.encode() not in [x[0] for x in ls(self.dir)]:
                 raise SyntaxError("inexistant file")
             disk = Cache(DISK)
-            file = fopen(self.path, "r")
-            data = file.fread().encode() + to_write.encode()
+            if self.mode == "a":
+                file = fopen(self.path, "r")
+                data = file.fread().encode() + to_write.encode()
+            else:  # self.mode = "ab"
+                file = fopen(self.path, "rb")
+                data = file.fread() + to_write
             file.fclose()
             for x in range(len(data) // 512 + 1 * int(len(data) % 512 != 0)):
                 if x < len(self.location):
