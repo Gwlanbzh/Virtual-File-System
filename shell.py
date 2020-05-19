@@ -1,4 +1,4 @@
-{1}  #!usr/bin/env python3
+#!usr/bin/env python3
 
 import argparse
 import fs
@@ -11,6 +11,7 @@ sys.path.insert(
 )
 import screen
 
+FILE = "/home/kwikkill/Desktop/disk.dsk"
 WORKING_DIRECTORY = "/"
 
 # docstring parameter
@@ -37,17 +38,19 @@ def unknown_cmd(arguments: list):
 # file exist
 
 
-@docstring_parameter(screen.BOLD, screen.DEFAULT)
 def file_exist(PATH: str, file: str) -> bool:
     """retourne 0 si le fichier existe et si c'est un dossier,
        retourne 1 si le fichier existe et si c'est un fichier,
        retourne -1 si le fichier n'existe pas
     """
-    dir = fs.ls(PATH)
-    for x in dir:
-        if x[0] == file.encode():
-            return int(x[2].decode())
-    return -1
+    try:
+        dir = fs.ls(PATH)
+        for x in dir:
+            if x[0] == file.encode():
+                return int(x[2].decode())
+        return -1
+    except Exception:
+        return -1
 
 
 # size
@@ -372,7 +375,76 @@ def cp(arguments: list):
 {0}DESCRIPTION:{1}
     Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.
     """
-    pass
+    parser = argparse.ArgumentParser()
+    # parser.add_argument("-s", "--secure", action="store_true", default="False")
+    parser.add_argument(
+        "path1", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "file1", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "path2", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "file2", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments.split())
+    # print(args)
+
+    if args.file1 == "":
+        print("error")
+        return
+    if (
+        args.path1 != ""
+        and args.file1 != ""
+        and args.path2 == ""
+        and args.file2 == ""
+    ):
+        PATH1 = WORKING_DIRECTORY
+        PATH2 = WORKING_DIRECTORY
+        file1 = args.path1
+        file2 = args.file1
+    elif (
+        args.path1 != ""
+        and args.file1 != ""
+        and args.path2 != ""
+        and args.file2 != ""
+    ):
+        PATH1 = args.path1
+        PATH2 = args.path2
+        file1 = args.file1
+        file2 = args.file2
+    elif args.file2 == "" and file_exist(args.path1, args.file1) == 1:
+        PATH1 = args.path1
+        file1 = args.file1
+        PATH2 = WORKING_DIRECTORY
+        file2 = args.path2
+    elif args.file2 == "" and file_exist(args.file1, args.path2) == 1:
+        PATH1 = WORKING_DIRECTORY
+        file1 = args.path1
+        PATH2 = args.file1
+        file2 = args.path2
+    if PATH1[0] != "/":
+        PATH1 = WORKING_DIRECTORY + PATH1
+    if PATH1[-1] != "/":
+        PATH1 += "/"
+    if PATH2[0] != "/":
+        PATH2 = WORKING_DIRECTORY + PATH2
+    if PATH2[-1] != "/":
+        PATH2 += "/"
+    if not file_exist(PATH1, file1) == 1 and not file_exist(PATH2, file2) == 1:
+        pass
+    print(PATH1, file1, PATH2, file2)
+    try:
+        filea1 = fs.fopen(PATH1 + file1, "r")
+        filea2 = fs.fopen(PATH2 + file2, "w")
+    except Exception:
+        print("error")
+        return
+    content = filea1.fread()
+    filea2.fwrite(content)
+    print("done")
 
 
 # rm
@@ -424,7 +496,7 @@ def rm(arguments: list):  # PATH: str, file: str, mode=0):
 
 
 @docstring_parameter(screen.BOLD, screen.DEFAULT)
-def mv(file1: str, file2: str):
+def mv(arguments: list):
     """{0}NAME:{1}
     mv - move (rename) files
 
@@ -434,7 +506,77 @@ def mv(file1: str, file2: str):
 {0}DESCRIPTION:{1}
     Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.
     """
-    pass
+    parser = argparse.ArgumentParser()
+    # parser.add_argument("-s", "--secure", action="store_true", default="False")
+    parser.add_argument(
+        "path1", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "file1", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "path2", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "file2", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments.split())
+    # print(args)
+
+    if args.file1 == "":
+        print("error")
+        return
+    if (
+        args.path1 != ""
+        and args.file1 != ""
+        and args.path2 == ""
+        and args.file2 == ""
+    ):
+        PATH1 = WORKING_DIRECTORY
+        PATH2 = WORKING_DIRECTORY
+        file1 = args.path1
+        file2 = args.file1
+    elif (
+        args.path1 != ""
+        and args.file1 != ""
+        and args.path2 != ""
+        and args.file2 != ""
+    ):
+        PATH1 = args.path1
+        PATH2 = args.path2
+        file1 = args.file1
+        file2 = args.file2
+    elif args.file2 == "" and file_exist(args.path1, args.file1) == 1:
+        PATH1 = args.path1
+        file1 = args.file1
+        PATH2 = WORKING_DIRECTORY
+        file2 = args.path2
+    elif args.file2 == "" and file_exist(args.file1, args.path2) == 1:
+        PATH1 = WORKING_DIRECTORY
+        file1 = args.path1
+        PATH2 = args.file1
+        file2 = args.path2
+    if PATH1[0] != "/":
+        PATH1 = WORKING_DIRECTORY + PATH1
+    if PATH1[-1] != "/":
+        PATH1 += "/"
+    if PATH2[0] != "/":
+        PATH2 = WORKING_DIRECTORY + PATH2
+    if PATH2[-1] != "/":
+        PATH2 += "/"
+    if not file_exist(PATH1, file1) == 1 and not file_exist(PATH2, file2) == 1:
+        pass
+    print(PATH1, file1, PATH2, file2)
+    try:
+        filea1 = fs.fopen(PATH1 + file1, "r")
+        filea2 = fs.fopen(PATH2 + file2, "w")
+    except Exception:
+        print("error")
+        return
+    content = filea1.fread()
+    filea2.fwrite(content)
+    fs.rm(PATH1, file1)
+    print("done")
 
 
 # cat
@@ -468,9 +610,16 @@ def cat(arguments: list):
     else:
         PATH = args.path
         file = args.file
+    if PATH[0] != "/":
+        PATH = WORKING_DIRECTORY + PATH
+    if PATH[-1] != "/":
+        PATH += "/"
+    if not file_exist(PATH, file) == 1:
+        print("fichier inexistant")
+        return
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
-        print("fichier non existant")
+        print("fichier inexistant")
         return
     try:
         file = fs.fopen(PATH + file, "r")
@@ -515,7 +664,13 @@ def tac(arguments: list):
     else:
         PATH = args.path
         file = args.file
-
+    if PATH[0] != "/":
+        PATH = WORKING_DIRECTORY + PATH
+    if PATH[-1] != "/":
+        PATH += "/"
+    if not file_exist(PATH, file) == 1:
+        print("fichier inexistant")
+        return
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
         print("fichier non existant")
@@ -563,7 +718,13 @@ def head(arguments: list):
     else:
         PATH = args.path
         file = args.file
-
+    if PATH[0] != "/":
+        PATH = WORKING_DIRECTORY + PATH
+    if PATH[-1] != "/":
+        PATH += "/"
+    if not file_exist(PATH, file) == 1:
+        print("fichier inexistant")
+        return
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
         print("fichier non existant")
@@ -612,7 +773,13 @@ def tail(arguments: list):
     else:
         PATH = args.path
         file = args.file
-
+    if PATH[0] != "/":
+        PATH = WORKING_DIRECTORY + PATH
+    if PATH[-1] != "/":
+        PATH += "/"
+    if not file_exist(PATH, file) == 1:
+        print("fichier inexistant")
+        return
     files = [x[0] for x in fs.ls(PATH)]
     if file.encode() not in files:
         print("fichier non existant")
@@ -781,4 +948,5 @@ def main():
 #
 
 if __name__ == "__main__":
+    fs.open(FILE)
     main()
