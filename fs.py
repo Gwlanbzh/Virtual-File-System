@@ -3,7 +3,7 @@ from cache import Cache
 from math import ceil
 import string
 
-DISK = "~/projects/fs/disk.dsk"  # disk location
+DISK = ""  # disk location
 ROOT_LOCATION = 0  # root dir location
 
 # file globals var
@@ -30,10 +30,11 @@ def init(PATH: str, size: int) -> int:
     bin_table_size = bytes([table_size // 256, table_size % 256])
     ROOT_LOCATION = table_size
     new_disk = Cache(PATH)
-    new_disk.write(size, bin_table_size + b"\xF8")  #  + b"\xF8" is here because the 5 first block are used - and allocated - for the root directory. Here begins the allocation table.
+    new_disk.write(
+        size, bin_table_size + b"\xF8"
+    )  #  + b"\xF8" is here because the 5 first block are used - and allocated - for the root directory. Here begins the allocation table.
 
 
-    
 # Opening ("mounting") a virtual disk.
 
 
@@ -54,6 +55,8 @@ def open(PATH):
 def ls(DIR: str) -> list:
     """Read a directory's content.
     """
+    if DISK == "" and ROOT_LOCATION == 0:
+        raise Exception("disque need to bee open")
     path = DIR.split("/")
     if path[0] == "" and path[len(path) - 1] == "":
         path[0] = "/"
@@ -104,6 +107,8 @@ def ls(DIR: str) -> list:
 def mkdir(parent_dir, NAME: str) -> int:
     """Creates an empty directory.
     """
+    if DISK == "" and ROOT_LOCATION == 0:
+        raise Exception("disque need to bee open")
     if len(NAME) > FILE_NAME_SIZE:
         raise SyntaxError("bad file name")
     for i in NAME:
@@ -129,6 +134,8 @@ def mkdir(parent_dir, NAME: str) -> int:
 def rmdir(parent_dir, NAME: str) -> int:
     """Delete an empty directory.
     """
+    if DISK == "" and ROOT_LOCATION == 0:
+        raise Exception("disque need to bee open")
     if NAME.encode() not in [x[0] for x in ls(parent_dir)]:
         return -1
     if ls(parent_dir + NAME + "/") != []:
@@ -189,6 +196,8 @@ def rmdir(parent_dir, NAME: str) -> int:
 def rm(parent_dir, NAME: str, mode=0):
     """delete a file (mode 1 = secure)
     """
+    if DISK == "" and ROOT_LOCATION == 0:
+        raise Exception("disque need to bee open")
     try:
         ls(parent_dir)
     except SyntaxError as e:
@@ -257,6 +266,8 @@ def rm(parent_dir, NAME: str, mode=0):
 
 
 def set_location(PATH: str, file: str, loc: list, state=b"1"):
+    if DISK == "" and ROOT_LOCATION == 0:
+        raise Exception("disque need to bee open")
     dir_content = ls(PATH)
     loc_file = None
     for x in range(len(dir_content)):
@@ -319,6 +330,8 @@ def set_location(PATH: str, file: str, loc: list, state=b"1"):
 def free_block():
     """return the first block which is unused
     """
+    if DISK == "" and ROOT_LOCATION == 0:
+        raise Exception("disque need to bee open")
     disk = Cache(DISK)
     disk.seek(0)
     data = disk.read(1)
@@ -337,6 +350,8 @@ def free_block():
 
 
 def use_block(block: int, state="1"):
+    if DISK == "" and ROOT_LOCATION == 0:
+        raise Exception("disque need to bee open")
     disk = Cache(DISK)
     disk.seek(0)
     data = disk.read(1)
@@ -366,6 +381,8 @@ class fopen(object):
     def __init__(self, PATH: str, mode: str):
         """Opens a file.
         """
+        if DISK == "" and ROOT_LOCATION == 0:
+            raise Exception("disque need to bee open")
         self.cursor = 0
         if mode not in ("r", "w", "a", "rb", "wb", "ab"):
             raise SyntaxError("bad mode")
