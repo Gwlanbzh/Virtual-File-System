@@ -28,7 +28,7 @@ A directory is a file, containing links to other files. Hence, a directory has g
 
 ```file1:emplacement+emplacement:[is_directory];file2:emplacement+emplacement:[is_directory]```
 
-The files's definitions are surrounded by semicolons, and are made of its name, then the block in which it is (separated with `+`), then a \[is_directory] data: if it is set to `1`, the file defined is a directory; else, it is not. These three elements are separated with a semicolon. `emplacement` is encoded on 4 bytes.
+The files's definitions are surrounded by semicolons, and are made of its name, then the block in which it is (separated with `+`), then a \[is_directory] data: if it is set to `0`, the file defined is a directory; else, it is not. These three elements are separated with a semicolon. `emplacement` is encoded on 4 bytes.
 
 #### The root directory.
 
