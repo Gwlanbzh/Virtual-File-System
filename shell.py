@@ -11,7 +11,7 @@ sys.path.insert(
 )
 import screen
 
-FILE = "/home/kwikkill/Desktop/disk.dsk"
+FILE = ""
 WORKING_DIRECTORY = "/"
 
 # docstring parameter
