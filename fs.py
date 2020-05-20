@@ -108,7 +108,7 @@ def mkdir(parent_dir, NAME: str) -> int:
     """Creates an empty directory.
     """
     if DISK == "" and ROOT_LOCATION == 0:
-        raise Exception("disque need to bee open")
+        raise Exception("disque need to be open")
     if len(NAME) > FILE_NAME_SIZE:
         raise SyntaxError("bad file name")
     for i in NAME:
@@ -135,7 +135,7 @@ def rmdir(parent_dir, NAME: str) -> int:
     """Delete an empty directory.
     """
     if DISK == "" and ROOT_LOCATION == 0:
-        raise Exception("disque need to bee open")
+        raise Exception("disque need to be open")
     if NAME.encode() not in [x[0] for x in ls(parent_dir)]:
         return -1
     if ls(parent_dir + NAME + "/") != []:
@@ -197,7 +197,7 @@ def rm(parent_dir, NAME: str, mode=0):
     """delete a file (mode 1 = secure)
     """
     if DISK == "" and ROOT_LOCATION == 0:
-        raise Exception("disque need to bee open")
+        raise Exception("disque need to be open")
     try:
         ls(parent_dir)
     except SyntaxError as e:
@@ -267,7 +267,7 @@ def rm(parent_dir, NAME: str, mode=0):
 
 def set_location(PATH: str, file: str, loc: list, state=b"1"):
     if DISK == "" and ROOT_LOCATION == 0:
-        raise Exception("disque need to bee open")
+        raise Exception("disque need to be open")
     dir_content = ls(PATH)
     loc_file = None
     for x in range(len(dir_content)):
@@ -331,7 +331,7 @@ def free_block():
     """return the first block which is unused
     """
     if DISK == "" and ROOT_LOCATION == 0:
-        raise Exception("disque need to bee open")
+        raise Exception("disque need to be open")
     disk = Cache(DISK)
     disk.seek(0)
     data = disk.read(1)
@@ -344,6 +344,7 @@ def free_block():
     for x in range(len(data_bin)):
         if data_bin[x] != "1":
             return x + ROOT_LOCATION
+    raise Exception("Disk is full !")
 
 
 # set a bloc to used statut
@@ -351,7 +352,7 @@ def free_block():
 
 def use_block(block: int, state="1"):
     if DISK == "" and ROOT_LOCATION == 0:
-        raise Exception("disque need to bee open")
+        raise Exception("disque need to be open")
     disk = Cache(DISK)
     disk.seek(0)
     data = disk.read(1)
@@ -382,7 +383,7 @@ class fopen(object):
         """Opens a file.
         """
         if DISK == "" and ROOT_LOCATION == 0:
-            raise Exception("disque need to bee open")
+            raise Exception("disque need to be open")
         self.cursor = 0
         if mode not in ("r", "w", "a", "rb", "wb", "ab"):
             raise SyntaxError("bad mode")
