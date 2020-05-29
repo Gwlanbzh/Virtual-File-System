@@ -93,23 +93,23 @@ class Frame(wx.Frame):
                 new_contain.append([int(x[2].decode()), x[0], x[1]])
             contain = sorted(new_contain)
         nbr = len(contain) // 5 + 1 * int(len(contain) % 5 != 0)
-        for x in range(nbr):
+        for x in range(0, nbr):
             panel = wx.Panel(self.vscroll, -1, size=(485, 100), pos=(0, 0))
             panel.SetBackgroundColour("#FFFFFF")
-            if x < len(contain):
+            if x * 5 < len(contain):
                 container1 = wx.Panel(panel, -1, size=(90, 90), pos=(5, 5))
                 container1.SetBackgroundColour("#8b8b8b")
-                if contain[x][0] == 0:
+                if contain[x * 5][0] == 0:
                     container1.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x][1]),
+                        lambda event: self.cd(event, contain[x * 5][1]),
                     )
 
-                if contain[x][0] == 0:
+                if contain[x * 5][0] == 0:
                     image = wx.Image("ressource/image/folder.png").Scale(
                         60, 60, wx.IMAGE_QUALITY_HIGH
                     )
-                elif contain[x][0] == 1:
+                elif contain[x * 5][0] == 1:
                     image = wx.Image("ressource/image/file.png").Scale(
                         60, 60, wx.IMAGE_QUALITY_HIGH
                     )
@@ -120,38 +120,38 @@ class Frame(wx.Frame):
                     size=(60, 60),
                     pos=(15, 10),
                 )
-                if contain[x][0] == 0:
+                if contain[x * 5][0] == 0:
                     bitmap1.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x][1]),
+                        lambda event: self.cd(event, contain[x * 5][1]),
                     )
 
                 label1 = wx.StaticText(
                     container1,
                     -1,
-                    contain[x][1],
+                    contain[x * 5][1],
                     size=(90, 20),
                     pos=(0, 70),
                     style=wx.ALIGN_CENTRE,
                 )
-                if contain[x][0] == 0:
+                if contain[x * 5][0] == 0:
                     label1.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x][1]),
+                        lambda event: self.cd(event, contain[x * 5][1]),
                     )
-            if x + 1 < len(contain):
+            if x * 5 + 1 < len(contain):
                 container2 = wx.Panel(panel, -1, size=(90, 90), pos=(101, 5))
                 container2.SetBackgroundColour("#8b8b8b")
-                if contain[x + 1][0] == 0:
+                if contain[x * 5 + 1][0] == 0:
                     container2.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 1][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 1][1]),
                     )
-                if contain[x + 1][0] == 0:
+                if contain[x * 5 + 1][0] == 0:
                     image = wx.Image("ressource/image/folder.png").Scale(
                         60, 60, wx.IMAGE_QUALITY_HIGH
                     )
-                elif contain[x + 1][0] == 1:
+                elif contain[x * 5 + 1][0] == 1:
                     image = wx.Image("ressource/image/file.png").Scale(
                         60, 60, wx.IMAGE_QUALITY_HIGH
                     )
@@ -162,37 +162,37 @@ class Frame(wx.Frame):
                     size=(60, 60),
                     pos=(15, 10),
                 )
-                if contain[x + 1][0] == 0:
+                if contain[x * 5 + 1][0] == 0:
                     bitmap2.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 1][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 1][1]),
                     )
                 label2 = wx.StaticText(
                     container2,
                     -1,
-                    contain[x + 1][1],
+                    contain[x * 5 + 1][1],
                     size=(90, 20),
                     pos=(0, 70),
                     style=wx.ALIGN_CENTRE,
                 )
-                if contain[x + 1][0] == 0:
+                if contain[x * 5 + 1][0] == 0:
                     label2.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 1][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 1][1]),
                     )
-            if x + 2 < len(contain):
+            if x * 5 + 2 < len(contain):
                 container3 = wx.Panel(panel, -1, size=(90, 90), pos=(197, 5))
                 container3.SetBackgroundColour("#8b8b8b")
-                if contain[x + 2][0] == 0:
+                if contain[x * 5 + 2][0] == 0:
                     container3.Bind(
                         wx.EVT_LEFT_UP,
                         lambda event: self.cd(event, contain[x + 2][1]),
                     )
-                if contain[x + 2][0] == 0:
+                if contain[x * 5 + 2][0] == 0:
                     image = wx.Image("ressource/image/folder.png").Scale(
                         60, 60, wx.IMAGE_QUALITY_HIGH
                     )
-                elif contain[x + 2][0] == 1:
+                elif contain[x * 5 + 2][0] == 1:
                     image = wx.Image("ressource/image/file.png").Scale(
                         60, 60, wx.IMAGE_QUALITY_HIGH
                     )
@@ -203,37 +203,37 @@ class Frame(wx.Frame):
                     size=(60, 60),
                     pos=(15, 10),
                 )
-                if contain[x + 2][0] == 0:
+                if contain[x * 5 + 2][0] == 0:
                     bitmap3.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 2][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 2][1]),
                     )
                 label3 = wx.StaticText(
                     container3,
                     -1,
-                    contain[x + 2][1],
+                    contain[x * 5 + 2][1],
                     size=(90, 20),
                     pos=(0, 70),
                     style=wx.ALIGN_CENTRE,
                 )
-                if contain[x + 2][0] == 0:
+                if contain[x * 5 + 2][0] == 0:
                     label3.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 2][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 2][1]),
                     )
-            if x + 3 < len(contain):
+            if x * 5 + 3 < len(contain):
                 container4 = wx.Panel(panel, -1, size=(90, 90), pos=(293, 5))
                 container4.SetBackgroundColour("#8b8b8b")
-                if contain[x + 3][0] == 0:
+                if contain[x * 5 + 3][0] == 0:
                     container4.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 3][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 3][1]),
                     )
-                if contain[x + 3][0] == 0:
+                if contain[x * 5 + 3][0] == 0:
                     image = wx.Image("ressource/image/folder.png").Scale(
                         60, 60, wx.IMAGE_QUALITY_HIGH
                     )
-                elif contain[x + 3][0] == 1:
+                elif contain[x * 5 + 3][0] == 1:
                     image = wx.Image("ressource/image/file.png").Scale(
                         60, 60, wx.IMAGE_QUALITY_HIGH
                     )
@@ -244,37 +244,37 @@ class Frame(wx.Frame):
                     size=(60, 60),
                     pos=(15, 10),
                 )
-                if contain[x + 3][0] == 0:
+                if contain[x * 5 + 3][0] == 0:
                     bitmap4.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 3][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 3][1]),
                     )
                 label4 = wx.StaticText(
                     container4,
                     -1,
-                    contain[x + 3][1],
+                    contain[x * 5 + 3][1],
                     size=(90, 20),
                     pos=(0, 70),
                     style=wx.ALIGN_CENTRE,
                 )
-                if contain[x + 3][0] == 0:
+                if contain[x * 5 + 3][0] == 0:
                     label4.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 3][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 3][1]),
                     )
-            if x + 4 < len(contain):
+            if x * 5 + 4 < len(contain):
                 container5 = wx.Panel(panel, -1, size=(90, 90), pos=(389, 5))
                 container5.SetBackgroundColour("#8b8b8b")
-                if contain[x + 4][0] == 0:
+                if contain[x * 5 + 4][0] == 0:
                     container5.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 4][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 4][1]),
                     )
-                if contain[x + 4][0] == 0:
+                if contain[x * 5 + 4][0] == 0:
                     image = wx.Image("ressource/image/folder.png").Scale(
                         60, 60, wx.IMAGE_QUALITY_HIGH
                     )
-                elif contain[x + 4][0] == 1:
+                elif contain[x * 5 + 4][0] == 1:
                     image = wx.Image("ressource/image/file.png").Scale(
                         60, 60, wx.IMAGE_QUALITY_HIGH
                     )
@@ -285,23 +285,23 @@ class Frame(wx.Frame):
                     size=(60, 60),
                     pos=(15, 10),
                 )
-                if contain[x + 4][0] == 0:
+                if contain[x * 5 + 4][0] == 0:
                     bitmap5.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 4][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 4][1]),
                     )
                 label5 = wx.StaticText(
                     container5,
                     -1,
-                    contain[x + 4][1],
+                    contain[x * 5 + 4][1],
                     size=(90, 20),
                     pos=(0, 70),
                     style=wx.ALIGN_CENTRE,
                 )
-                if contain[x + 4][0] == 0:
+                if contain[x * 5 + 4][0] == 0:
                     label5.Bind(
                         wx.EVT_LEFT_UP,
-                        lambda event: self.cd(event, contain[x + 4][1]),
+                        lambda event: self.cd(event, contain[x * 5 + 4][1]),
                     )
             bsizer.Add(panel, 0, wx.ALL, 5)
 
