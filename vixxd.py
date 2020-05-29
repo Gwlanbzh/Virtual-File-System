@@ -1,16 +1,20 @@
 import fs
 from sys import argv
 
+
 def bytes_to_ascii(byte):
-    if int.from_bytes(byte, "big") >= 33 and int.from_bytes(byte, "big") <= 126:
+    if (
+        int.from_bytes(byte, "big") >= 33
+        and int.from_bytes(byte, "big") <= 126
+    ):
         return byte.decode()
     else:
         return "."
 
+
 def main(path):
     fd = fs.fopen(path, "rb")
     data = fd.fread()
-    print(type(data))
     fd.fclose()
     i = 0
     lines = []
@@ -28,6 +32,7 @@ def main(path):
         i += 1
     r += " " * (66 - len(r.split("\n")[-1]) - 16) + ascii_form
     return r
+
 
 if __name__ == "__main__":
     fs.open(argv[1])

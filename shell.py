@@ -5,6 +5,7 @@ import fs
 import sys
 import os
 import os.path as osp
+import vixxd
 
 sys.path.insert(
     0, osp.abspath(osp.join(osp.dirname(osp.abspath(__file__)), "ressource"))
@@ -892,7 +893,7 @@ def man(arguments: list):
 
 
 @docstring_parameter(screen.BOLD, screen.DEFAULT)
-def exit():
+def exit(arguments):
     """{0}NAME:{1}
     exit - exit shell
 
@@ -903,6 +904,45 @@ def exit():
     exit the shell
     """
     pass
+
+
+@docstring_parameter(screen.BOLD, screen.DEFAULT)
+def xxd(arguments: list):
+    """
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "path", type=str, action="store", default="", nargs="?"
+    )
+    parser.add_argument(
+        "file", type=str, action="store", default="", nargs="?"
+    )
+    args = parser.parse_args(arguments.split())
+    if args.path == "" and args.file == "":
+        print("error")
+        return
+    if args.path != "" and args.file == "":
+        PATH = WORKING_DIRECTORY
+        file = args.path
+    else:
+        PATH = args.path
+        file = args.file
+    if PATH[0] != "/":
+        PATH = WORKING_DIRECTORY + PATH
+    if PATH[-1] != "/":
+        PATH += "/"
+    if not file_exist(PATH, file) == 1:
+        print("fichier inexistant")
+        return
+    files = [x[0] for x in fs.ls(PATH)]
+    if file.encode() not in files:
+        print("fichier non existant")
+        return
+    try:
+        print(vixxd.main(PATH + "/" + file))
+    except SyntaxError as e:
+        print(e)
+        return
 
 
 COMMANDS = {
@@ -923,6 +963,7 @@ COMMANDS = {
     "echo": echo,
     "list": list,
     "exit": exit,
+    "xxd": xxd,
 }
 
 
