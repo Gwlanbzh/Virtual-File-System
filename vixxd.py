@@ -10,7 +10,6 @@ def bytes_to_ascii(byte):
 def main(path):
     fd = fs.fopen(path, "rb")
     data = fd.fread()
-    print(type(data))
     fd.fclose()
     i = 0
     lines = []
