@@ -1,4 +1,3 @@
-import fs
 from sys import argv
 
 
@@ -35,5 +34,6 @@ def main(path):
 
 
 if __name__ == "__main__":
+    import fs
     fs.open(argv[1])
     print(main(argv[2]))
