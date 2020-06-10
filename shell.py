@@ -893,7 +893,7 @@ def man(arguments: list):
 
 
 @docstring_parameter(screen.BOLD, screen.DEFAULT)
-def exit(arguments):
+def exit():
     """{0}NAME:{1}
     exit - exit shell
 
@@ -970,7 +970,8 @@ COMMANDS = {
 # main
 
 
-def main():
+def main(file=FILE):
+    FILE = file
     while True:
         inp = input(
             screen.BLUE
