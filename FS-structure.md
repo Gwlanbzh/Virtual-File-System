@@ -20,7 +20,7 @@ For each block, we must know if it is allocated or not; there is a table that re
 
 ## 3. The files.
 
-A file has mo metadata. It will be made of nothing else than the data it contains, and will be defined in the directories it is in (see .
+A file has mo metadata. It will be made of nothing else than the data it contains, and will be defined in the directories it is in (see beneath, "Directories").
 
 ### Directories.
 
