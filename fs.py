@@ -71,16 +71,47 @@ def ls(DIR: str) -> list:
         for x in emplacement:
             diskfile.seek(x)
             dir += diskfile.read(1)
-        data = dir.strip(b"\x00").split(";".encode())
+        data = dir.strip(b"\x00")
+        data2 = []
+        sss = 0
+        xx = 0
+        data3 = ";".encode() + data
+        while True:
+            data2.append([b"", [], b"0"])
+            for aaaa in range(sss, len(data3)):
+                if bytes([data3[aaaa]]) == ":".encode():
+                    data2[xx][0] = data3[sss + 1 : aaaa]
+                    sss = aaaa
+                    break
+            for aaaa in range(sss, len(data3)):
+                if (
+                    (aaaa - sss) % 5 == 0
+                    and aaaa != sss
+                    and bytes([data3[aaaa]]) == "+".encode()
+                ):
+                    data2[xx][1].append(data3[aaaa - 4 : aaaa])
+                elif (
+                    (aaaa - sss) % 5 == 0
+                    and aaaa != sss
+                    and bytes([data3[aaaa]]) == ":".encode()
+                ):
+                    data2[xx][1].append(data3[aaaa - 4 : aaaa])
+                    data2[xx][2] = bytes([data3[aaaa + 1]])
+                    sss = aaaa + 2
+                    break
+            xx += 1
+            if sss == len(data3):
+                break
+
+        data = data.split(";".encode())
         data = [x.split(":".encode()) for x in data]
         if data == [[b""]] and i == len(path) - 1:
             return []
         elif data == [[b""]] and i != len(path) - 1:
             raise SyntaxError("invalid path : " + DIR)
+        data = data2
         for x in range(len(data)):
             locs = []
-            # print(data, x)
-            data[x][1] = data[x][1].split("+".encode())
             for y in range(len(data[x][1])):
                 loc = 0
                 for j in range(len(data[x][1][y])):
@@ -512,13 +543,13 @@ class fopen(object):
             for x in range(len(data) // 512 + 1 * int(len(data) % 512 != 0)):
                 if x < len(self.location):
                     disk.seek(self.location[x])
-                    disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
+                    disk.write(1, data[x * 512 : (x + 1) * 512])
                 else:
                     bloc = free_block()
                     use_block(bloc)
                     self.location.append(bloc)
                     disk.seek(bloc)
-                    disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
+                    disk.write(1, data[x * 512 : (x + 1) * 512])
             while x < (len(self.location) - 1):
                 use_block(self.location[x + 1], "0")
                 self.location.pop(x + 1)
