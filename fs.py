@@ -76,6 +76,8 @@ def ls(DIR: str) -> list:
         sss = 0
         xx = 0
         data3 = ";".encode() + data
+        if data == b"":
+            return []
         while True:
             data2.append([b"", [], b"0"])
             for aaaa in range(sss, len(data3)):
@@ -103,13 +105,11 @@ def ls(DIR: str) -> list:
             if sss == len(data3):
                 break
 
-        data = data.split(";".encode())
-        data = [x.split(":".encode()) for x in data]
+        data = data2
         if data == [[b""]] and i == len(path) - 1:
             return []
         elif data == [[b""]] and i != len(path) - 1:
             raise SyntaxError("invalid path : " + DIR)
-        data = data2
         for x in range(len(data)):
             locs = []
             for y in range(len(data[x][1])):
@@ -348,7 +348,7 @@ def set_location(PATH: str, file: str, loc: list, state=b"1"):
     data = data[0 : len(data) - 1]
     for x in range(len(data) // 512 + 1 * int(len(data) % 512 != 0)):
         disk.seek(loc_dir[x])
-        disk.write(1, data[x * 512 : (x + 1) * 512 - 1])
+        disk.write(1, data[x * 512 : (x + 1) * 512])
         disk.seek(loc_dir[x])
     return 0
 
